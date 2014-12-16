@@ -10,7 +10,7 @@ def getConfig(cfile):
             httpconf, wechat, simsimi = yaml.load_all(f.read())
             config['HTTP'] = httpconf
             config['WeChat'] = wechat
-            config['SIMSIMI'] = wechat
+            config['SIMSIMI'] = simsimi
             f.close()
     except IOError as e:
         log.error(str(e))
