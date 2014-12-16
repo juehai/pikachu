@@ -39,7 +39,7 @@ def wechat():
     else:
         ret_set = frozenset(ret.items())
         matched_rules = (
-            _func for _func, _limitation in _wechat._hooks_mapping.items()
+            _func for _func, _limitation in _wechat._hooks
             if _limitation.issubset(ret_set))
         func = next(matched_rules, None)  # first matched rule
 
