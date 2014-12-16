@@ -77,6 +77,9 @@ class WeChat(object):
         formatted.update(parsed)
         return formatted
 
+    def parse_text(self, raw):
+        return {'content': raw.get('Content')}
+
     def render(self, username, type='text', sender=None, **kwargs):
         assert(False)
 
