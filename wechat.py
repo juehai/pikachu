@@ -77,6 +77,17 @@ class WeChat(object):
         formatted.update(parsed)
         return formatted
 
+    def format(self, kwargs):
+        timestamp = int(kwargs.get('CreateTime', 0))
+        return {
+            'id': kwargs.get('MsgId'),
+            'timestamp': timestamp,
+            'receiver': kwargs.get('ToUserName'),
+            'sender': kwargs.get('FromUserName'),
+            'type': kwargs.get('MsgType'),
+            'time': datetime.fromtimestamp(timestamp),
+        }
+
     def parse_text(self, raw):
         return {'content': raw.get('Content')}
 
