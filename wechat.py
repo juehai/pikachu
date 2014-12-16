@@ -1,14 +1,4 @@
-# coding: utf-8
-"""
-    flask_weixin
-    ~~~~~~~~~~~~
-
-    Weixin implementation in Flask.
-
-    :copyright: (c) 2013 - 2014 by Hsiaoming Yang.
-    :license: BSD, see LICENSE for more detail.
-"""
-
+# -*- coding: utf-8 -*-
 import time
 import hashlib
 from datetime import datetime
@@ -21,68 +11,52 @@ except ImportError:
     from xml.etree import ElementTree as etree
 
 
-__all__ = ('Weixin',)
-__version__ = '0.3.0'
-__author__ = 'Hsiaoming Yang <me@lepture.com>'
+__all__ = ('WeChat',)
+__version__ = '0.4.0'
+__author__ = ['Yang Gao <gaoyang.public@gmail.com>',
+              'Hsiaoming Yang <me@lepture.com>']
 
-class Weixin(object):
-    """Interface for mp.weixin.qq.com
-
-    http://mp.weixin.qq.com/wiki/index.php
-    """
-
-    def __init__(self, app=None):
-        self.token = None
-        self._registry = {}
-        self._registry_without_key = []
-
-        if app:
-            self.init_app(app)
-
-    def init_app(self, app):
-        if hasattr(app, 'config'):
-            config = app.config
-        else:
-            # flask-weixin can be used without flask
-            config = app
-
-        self.token = config.get('WEIXIN_TOKEN', None)
-        self.sender = config.get('WEIXIN_SENDER', None)
-        self.expires_in = config.get('WEIXIN_EXPIRES_IN', 0)
-
+class WeChat(object):
+    
+    def __init__(self, config):
+        self.token = config.get('TOKEN', None)
+        self.expires_in = config.get('EXPIRES_IN', 0)
+        self._hooks = []
+        self._hooks_mapping = {}
+        
     def validate(self, signature, timestamp, nonce):
         """Validate request signature.
-
-        :param signature: A string signature parameter sent by weixin.
-        :param timestamp: A int timestamp parameter sent by weixin.
-        :param nonce: A int nonce parameter sent by weixin.
+    
+        :param signature: A string signature parameter sent by WeChat.
+        :param timestamp: A int timestamp parameter sent by WeChat.
+        :param nonce: A int nonce parameter sent by WeChat.
         """
         if not self.token:
-            raise RuntimeError('WEIXIN_TOKEN is missing')
-
+            raise RuntimeError('TOKEN is missing')
+    
         if self.expires_in:
             try:
                 timestamp = int(timestamp)
             except:
                 # fake timestamp
                 return False
-
+    
             delta = time.time() - timestamp
             if delta < 0:
                 # this is a fake timestamp
                 return False
-
+    
             if delta > self.expires_in:
                 # expired timestamp
                 return False
-
+    
         values = [self.token, str(timestamp), str(nonce)]
         s = ''.join(sorted(values))
         hsh = hashlib.sha1(s.encode('utf-8')).hexdigest()
         return signature == hsh
 
     def parse(self, content):
-        """Parse xml body sent by weixin.
+        """Parse xml body sent by WeChat.
 
         :param content: A text of xml body.
         """
@@ -103,53 +77,8 @@ class Weixin(object):
         formatted.update(parsed)
         return formatted
 
-    def format(self, kwargs):
-        timestamp = int(kwargs.get('CreateTime', 0))
-        return {
-            'id': kwargs.get('MsgId'),
-            'timestamp': timestamp,
-            'receiver': kwargs.get('ToUserName'),
-            'sender': kwargs.get('FromUserName'),
-            'type': kwargs.get('MsgType'),
-            'time': datetime.fromtimestamp(timestamp),
-        }
-
-    def parse_text(self, raw):
-        return {'content': raw.get('Content')}
-
-    def parse_image(self, raw):
-        return {'picurl': raw.get('PicUrl')}
-
-    def parse_location(self, raw):
-        return {
-            'location_x': raw.get('Location_X'),
-            'location_y': raw.get('Location_Y'),
-            'scale': int(raw.get('Scale', 0)),
-            'label': raw.get('Label'),
-        }
-
-    def parse_link(self, raw):
-        return {
-            'title': raw.get('Title'),
-            'description': raw.get('Description'),
-            'url': raw.get('url'),
-        }
-
-    def parse_event(self, raw):
-        return {
-            'event': raw.get('Event'),
-            'event_key': raw.get('EventKey'),
-            'ticket': raw.get('Ticket'),
-            'latitude': raw.get('Latitude'),
-            'longitude': raw.get('Longitude'),
-            'precision': raw.get('Precision'),
-        }
-
-    def parse_invalid_type(self, raw):
-        return {}
-
-    def reply(self, username, type='text', sender=None, **kwargs):
-        """Create the reply text for weixin.
+    def render(self, username, type='text', sender=None, **kwargs):
+        """Create the reply text for WeChat.
 
         The reply varies per reply type. The acceptable types are `text`,
         `music` and `news`. Each type accepts different parameters, but
@@ -180,7 +109,7 @@ class Weixin(object):
             sender = self.sender
 
         if not sender:
-            raise RuntimeError('WEIXIN_SENDER is missing')
+            raise RuntimeError('SENDER is missing')
 
         if type == 'text':
             content = kwargs.get('content', '')
@@ -198,6 +127,7 @@ class Weixin(object):
 
         return None
 
+
     def register(self, key=None, func=None, **kwargs):
         """Register a command helper function.
 
@@ -206,31 +136,32 @@ class Weixin(object):
             def print_help(**kwargs):
                 username = kwargs.get('sender')
                 sender = kwargs.get('receiver')
-                return weixin.reply(
+                return wechat.reply(
                     username, sender=sender, content='text reply'
                 )
 
-            weixin.register('help', print_help)
+            wechat.register('help', print_help)
 
         It is also accessible as a decorator::
 
-            @weixin.register('help')
+            @wechat.register('help')
             def print_help(*args, **kwargs):
                 username = kwargs.get('sender')
                 sender = kwargs.get('receiver')
-                return weixin.reply(
+                return wechat.reply(
                     username, sender=sender, content='text reply'
                 )
         """
         if func:
             if key is None:
                 limitation = frozenset(kwargs.items())
-                self._registry_without_key.append((func, limitation))
+                self._hooks.append((func, limitation))
             else:
-                self._registry[key] = func
+                self._hooks_mapping[key] = func
             return func
 
         return self.__call__(key, **kwargs)
+
 
     def __call__(self, key, **kwargs):
         """Register a reply function.
@@ -250,67 +181,6 @@ class Weixin(object):
             return func
 
         return wrapper
-
-    def view_func(self):
-        """Default view function for Flask app.
-
-        This is a simple implementation for view func, you can add it to
-        your Flask app::
-
-            weixin = Weixin(app)
-            app.add_url_rule('/', view_func=weixin.view_func)
-        """
-        from flask import request, Response
-
-        signature = request.args.get('signature')
-        timestamp = request.args.get('timestamp')
-        nonce = request.args.get('nonce')
-        print 'sig:', signature
-        if not self.validate(signature, timestamp, nonce):
-            return 'signature failed', 400
-
-        if request.method == 'GET':
-            echostr = request.args.get('echostr')
-            return echostr
-
-        try:
-            ret = self.parse(request.data)
-        except:
-            return 'invalid', 400
-
-        if 'type' not in ret:
-            # not a valid message
-            return 'invalid', 400
-
-        if ret['type'] == 'text' and ret['content'] in self._registry:
-            func = self._registry[ret['content']]
-        else:
-            ret_set = frozenset(ret.items())
-            matched_rules = (
-                _func for _func, _limitation in self._registry_without_key
-                if _limitation.issubset(ret_set))
-            func = next(matched_rules, None)  # first matched rule
-
-        if func is None:
-            if '*' in self._registry:
-                func = self._registry['*']
-            else:
-                func = 'failed'
-
-        if callable(func):
-            text = func(**ret)
-        else:
-            # plain text
-            text = self.reply(
-                username=ret['sender'],
-                sender=ret['receiver'],
-                content=func,
-            )
-
-        return Response(text, content_type='text/xml; charset=utf-8')
-
-    view_func.methods = ['GET', 'POST']
-
 
 def text_reply(username, sender, content):
     shared = _shared_reply(username, sender, 'text')
@@ -375,3 +245,4 @@ def _shared_reply(username, sender, type):
         '<MsgType><![CDATA[%(type)s]]></MsgType>'
     )
     return template % dct
+

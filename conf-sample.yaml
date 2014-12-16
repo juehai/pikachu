@@ -1,0 +1,14 @@
+# for HTTP server
+---
+host:       "127.0.0.1"
+port:       9999
+debug:      True
+secret_key: "securty"
+
+
+# for WeChat API
+---
+TOKEN:      ""
+APPID:      ""
+APPSECRET:  ""
+EXPIRES_IN: 0
