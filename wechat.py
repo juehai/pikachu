@@ -78,6 +78,8 @@ class WeChat(object):
         return formatted
 
     def render(self, username, type='text', sender=None, **kwargs):
+        assert(False)
+
         """Create the reply text for WeChat.
 
         The reply varies per reply type. The acceptable types are `text`,
@@ -127,7 +129,6 @@ class WeChat(object):
 
         return None
 
-
     def register(self, key=None, func=None, **kwargs):
         """Register a command helper function.
 
@@ -172,7 +173,7 @@ class WeChat(object):
             def print_help(*args, **kwargs):
                 username = kwargs.get('sender')
                 sender = kwargs.get('receiver')
-                return weixin.reply(
+                return weixin.render(
                     username, sender=sender, content='text reply'
                 )
         """
@@ -182,67 +183,90 @@ class WeChat(object):
 
         return wrapper
 
-def text_reply(username, sender, content):
-    shared = _shared_reply(username, sender, 'text')
-    template = '<xml>%s<Content><![CDATA[%s]]></Content></xml>'
-    return template % (shared, content)
+#####   def music_reply(username, sender, **kwargs):
+#####       kwargs['shared'] = _shared_reply(username, sender, 'music')
+#####   
+#####       template = (
+#####           '<xml>'
+#####           '%(shared)s'
+#####           '<Music>'
+#####           '<Title><![CDATA[%(title)s]]></Title>'
+#####           '<Description><![CDATA[%(description)s]]></Description>'
+#####           '<MusicUrl><![CDATA[%(music_url)s]]></MusicUrl>'
+#####           '<HQMusicUrl><![CDATA[%(hq_music_url)s]]></HQMusicUrl>'
+#####           '</Music>'
+#####           '</xml>'
+#####       )
+#####       return template % kwargs
+#####   
+#####   
+#####   def news_reply(username, sender, *items):
+#####       item_template = (
+#####           '<item>'
+#####           '<Title><![CDATA[%(title)s]]></Title>'
+#####           '<Description><![CDATA[%(description)s]]></Description>'
+#####           '<PicUrl><![CDATA[%(picurl)s]]></PicUrl>'
+#####           '<Url><![CDATA[%(url)s]]></Url>'
+#####           '</item>'
+#####       )
+#####       articles = map(lambda o: item_template % o, items)
+#####   
+#####       template = (
+#####           '<xml>'
+#####           '%(shared)s'
+#####           '<ArticleCount>%(count)d</ArticleCount>'
+#####           '<Articles>%(articles)s</Articles>'
+#####           '</xml>'
+#####       )
+#####       dct = {
+#####           'shared': _shared_reply(username, sender, 'news'),
+#####           'count': len(items),
+#####           'articles': ''.join(articles)
+#####       }
+#####       return template % dct
+#####   
+#####   
+#####   def _shared_reply(username, sender, type):
+#####       dct = {
+#####           'username': username,
+#####           'sender': sender,
+#####           'type': type,
+#####           'timestamp': int(time.time()),
+#####       }
+#####       template = (
+#####           '<ToUserName><![CDATA[%(username)s]]></ToUserName>'
+#####           '<FromUserName><![CDATA[%(sender)s]]></FromUserName>'
+#####           '<CreateTime>%(timestamp)d</CreateTime>'
+#####           '<MsgType><![CDATA[%(type)s]]></MsgType>'
+#####       )
+#####       return template % dct
 
+class WeChatReply(object):
 
-def music_reply(username, sender, **kwargs):
-    kwargs['shared'] = _shared_reply(username, sender, 'music')
+    def __init__(self, sender=None, receiver=None, type=None, **kw):
+        self.sender = sender
+        self.receiver = receiver
+        self.type = type
 
-    template = (
-        '<xml>'
-        '%(shared)s'
-        '<Music>'
-        '<Title><![CDATA[%(title)s]]></Title>'
-        '<Description><![CDATA[%(description)s]]></Description>'
-        '<MusicUrl><![CDATA[%(music_url)s]]></MusicUrl>'
-        '<HQMusicUrl><![CDATA[%(hq_music_url)s]]></HQMusicUrl>'
-        '</Music>'
-        '</xml>'
-    )
-    return template % kwargs
-
-
-def news_reply(username, sender, *items):
-    item_template = (
-        '<item>'
-        '<Title><![CDATA[%(title)s]]></Title>'
-        '<Description><![CDATA[%(description)s]]></Description>'
-        '<PicUrl><![CDATA[%(picurl)s]]></PicUrl>'
-        '<Url><![CDATA[%(url)s]]></Url>'
-        '</item>'
-    )
-    articles = map(lambda o: item_template % o, items)
-
-    template = (
-        '<xml>'
-        '%(shared)s'
-        '<ArticleCount>%(count)d</ArticleCount>'
-        '<Articles>%(articles)s</Articles>'
-        '</xml>'
-    )
-    dct = {
-        'shared': _shared_reply(username, sender, 'news'),
-        'count': len(items),
-        'articles': ''.join(articles)
-    }
-    return template % dct
-
-
-def _shared_reply(username, sender, type):
-    dct = {
-        'username': username,
-        'sender': sender,
-        'type': type,
-        'timestamp': int(time.time()),
-    }
-    template = (
-        '<ToUserName><![CDATA[%(username)s]]></ToUserName>'
-        '<FromUserName><![CDATA[%(sender)s]]></FromUserName>'
-        '<CreateTime>%(timestamp)d</CreateTime>'
-        '<MsgType><![CDATA[%(type)s]]></MsgType>'
-    )
-    return template % dct
-
+        for k, v in kw.items():
+            setattr(self, k, v)
+    
+    def _shared_reply(self, type):
+        dct = {
+            'username': self.receiver,
+            'sender': self.sender,
+            'type': self.type,
+            'timestamp': int(time.time()),
+        }
+        template = (
+            '<ToUserName><![CDATA[%(username)s]]></ToUserName>'
+            '<FromUserName><![CDATA[%(sender)s]]></FromUserName>'
+            '<CreateTime>%(timestamp)d</CreateTime>'
+            '<MsgType><![CDATA[%(type)s]]></MsgType>'
+        )
+        return template % dct
+   
+    def text_reply(self):
+        shared = self._shared_reply('text')
+        template = '<xml>%s<Content><![CDATA[%s]]></Content></xml>'
+        return template % (shared, self.content)

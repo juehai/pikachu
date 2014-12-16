@@ -1,38 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import time
+import views
+from config import config
 from flask import Flask
-from flask_weixin import Weixin
 
-def hello():
-    return 'Hello World!'
 
 app = Flask(__name__)
-app.secret_key = 'pikachu#robot'
-app.config['WEIXIN_TOKEN'] = 'apuniangATnz'
+app_config = config.get('HTTP', None)
 
-weixin = Weixin(app)
-app.add_url_rule('/', view_func=weixin.view_func)
-app.add_url_rule('/hello', view_func=hello)
+# flask URL routing
+app.add_url_rule('/', view_func=views.hello)
+app.add_url_rule('/wechat', view_func=views.wechat, methods=['GET', 'POST'])
+app.add_url_rule('/hello', view_func=views.hello)
 
 
-
-@weixin('*')
-def reply_all(**kwargs):
-    username = kwargs.get('sender')
-    sender = kwargs.get('receiver')
-    data = kwargs.get('content')
-    message_type = kwargs.get('type')
-
-    print kwargs
-    
-    content = 'res: %s ret:%s' % (data, time.time())
-
-    return weixin.reply(
-            username, sender=sender, content=content
-        )
-
+app.secret_key = app_config['secret_key']
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=9999, debug=True)
+
+    app.run(host=app_config['host'], 
+            port=app_config['port'], 
+            debug=app_config['debug'])

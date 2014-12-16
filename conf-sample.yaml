@@ -12,3 +12,9 @@ TOKEN:      ""
 APPID:      ""
 APPSECRET:  ""
 EXPIRES_IN: 0
+
+# for SimSimi API
+---
+API: "http://sandbox.api.simsimi.com/request.p"
+Key: "53954a78-a2f8-4465-89b0-92957b95758e"
+TIMEOUT: 10
