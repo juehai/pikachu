@@ -29,10 +29,13 @@ def simsimi_reply(**kw):
     except Exception as e:
         print 'SIMSIMI API was broking.'
 
+    if 'response' in ret:
+        content = ret['response']
+
     reply = WeChatReply(sender=sender, 
                         receiver=receiver,
                         type=type,
-                        content=ret['response'])
+                        content=content)
     msg = reply.text_reply()
     return msg
     
