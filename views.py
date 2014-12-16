@@ -34,8 +34,8 @@ def wechat():
         # not a valid message
         return 'invalid', 400
 
-    if ret['type'] == 'text' and ret['content'] in _wechat._hooks:
-        func = _wechat._hooks[ret['content']]
+    if ret['type'] == 'text' and ret['content'] in _wechat._hooks_mapping:
+        func = _wechat._hooks_mapping[ret['content']]
     else:
         ret_set = frozenset(ret.items())
         matched_rules = (
@@ -44,8 +44,8 @@ def wechat():
         func = next(matched_rules, None)  # first matched rule
 
     if func is None:
-        if '*' in _wechat._hooks:
-            func = _wechat._hooks['*']
+        if '*' in _wechat._hooks_mapping:
+            func = _wechat._hooks_mapping['*']
         else:
             func = 'failed'
 
