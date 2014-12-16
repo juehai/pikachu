@@ -32,7 +32,7 @@ def simsimi_reply(**kw):
     reply = WeChatReply(sender=sender, 
                         receiver=receiver,
                         type=type,
-                        content=content)
+                        content=ret['response'])
     msg = reply.text_reply()
     return msg
     
