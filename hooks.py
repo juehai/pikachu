@@ -2,7 +2,7 @@
 import time
 import requests
 from config import config
-from wechat import WeChatReply
+from wechat import WeChat, WeChatReply
 from flask import current_app as app
 
 _config = config.get('WeChat', None)
