@@ -21,8 +21,8 @@ __author__ = ['Yang Gao <gaoyang.public@gmail.com>',
               'Hsiaoming Yang <me@lepture.com>']
 
 class WeChat(object):
-    sex_mapping = {1: u'哥哥',
-                   2: u'姐姐',
+    sex_mapping = {1: u'帅哥',
+                   2: u'美女',
                    0: u''}
     
     def __init__(self, config):
