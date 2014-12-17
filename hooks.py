@@ -66,8 +66,7 @@ def event_reply(**kw):
     
     if event == u'subscribe':
         user = _wechat.getUserInfo(receiver)
-        content = u'%s %s 你好，感谢您关注阿扑娘滴新西兰纯净小店，请您持续关注这个公众号，也许你会发现惊喜。' % (user['wrap_sex'], 
-                                                                                                                 user['nickname'])
+        content = u'你好 %s<%s> 感谢您关注阿扑娘滴新西兰纯净小店，真心希望您持续关注这个公众号，也许您会发现许多惊喜 :)' % (user['wrap_sex'],user['nickname'])
         reply = WeChatReply(sender=sender, 
                             receiver=receiver,
                             type='text',
