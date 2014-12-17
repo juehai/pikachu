@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from config import config
-from flask import request, Response
+from flask import request
+from flask import Response
+from flask import current_app as app
 from wechat import WeChat
 from hooks import *
 
@@ -15,10 +17,12 @@ def hello():
     return "Hello, I'm Pikachu."
 
 def wechat():
+    app.logger.info('WeChat start.')
     signature = request.args.get('signature')
     timestamp = request.args.get('timestamp')
     nonce = request.args.get('nonce')
     if not _wechat.validate(signature, timestamp, nonce):
+        app.logger.error('Error: signature faild.')
         return 'signature failed', 400
 
     if request.method == 'GET':
@@ -28,10 +32,12 @@ def wechat():
     try:
         ret = _wechat.parse(request.data)
     except:
+        app.logger.error('Error: parse WeChat response fail.')
         return 'invalid', 400
 
     if 'type' not in ret:
         # not a valid message
+        app.logger.error('Error: invalid WeChat response format data.')
         return 'invalid', 400
 
     if ret['type'] == 'text' and ret['content'] in _wechat._hooks_mapping:
