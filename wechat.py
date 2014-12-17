@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
 import hashlib
+import requests
 from datetime import datetime
 
 try:
@@ -17,9 +18,15 @@ __author__ = ['Yang Gao <gaoyang.public@gmail.com>',
               'Hsiaoming Yang <me@lepture.com>']
 
 class WeChat(object):
+    sex_mapping = {1: u'哥哥',
+                   2: u'姐姐',
+                   0: u''}
     
     def __init__(self, config):
         self.token = config.get('TOKEN', None)
+        self.baseapi = config.get('BASEAPI', '')
+        self.appid = config.get('APPID', '')
+        self.appsecret = config.get('APPSECRET', '')
         self.expires_in = config.get('EXPIRES_IN', 0)
         self._hooks = []
         self._hooks_mapping = {}
@@ -54,6 +61,65 @@ class WeChat(object):
         s = ''.join(sorted(values))
         hsh = hashlib.sha1(s.encode('utf-8')).hexdigest()
         return signature == hsh
+
+    def getAccessToken(self):
+        # get access token from cache
+        try:
+            with open('.access_token', 'r') as f:
+                _ret = yaml.load(f.read())
+                delta = time.time() - timestamp
+                if delta < 0:
+                    # fake timestamp
+                    raise
+                elif delta > _ret['expires_in']:
+                    raise
+
+                f.close()
+                return _ret['access_token']
+        except:
+            pass
+
+        # refresh access token
+        api = '%s/token' % self.baseapi
+        params = {"grant_type": 'client_credential',
+                  "appid"     : self.appid,
+                  "secret"    : self.appsecret}
+
+        try:
+            resp = requests.get(api, params, timeout=10)
+            ret = resp.json()
+            timestamp = time.time()
+            timeframe = {'timestamp': timestamp}
+            ret.update(timeframe)
+        except Exception as e:
+            raise RuntimeError('WeChat api(getAccessToken) failed.')
+
+        # cache access token
+        try:
+            with open('.access_token', 'w+') as f:
+                f.write(yaml.dump(ret))
+                f.close()
+        except IOError as e:
+            raise RuntimeError('Cannot open access_token file.')
+
+        return ret['access_token']
+                
+
+    def getUserInfo(self, openid, lang='zh_CN'):
+        api = '%s/user/info' % self.baseapi
+        access_token = self.getAccessToken()
+        params = {"access_token": access_token, 
+                  "lang": lang}
+
+        try:
+            resp = requests.get(api, params, timeout=10)
+            ret = resp.json()
+            ret.update(dict(wrap_sex=self.sex_mapping[ret['sex']]))
+        except Exception as e:
+            raise RuntimeError('WeChat api(getUserInfo) failed.')
+
+        return ret
+        
 
     def parse(self, content):
         """Parse xml body sent by WeChat.

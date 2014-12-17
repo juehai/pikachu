@@ -14,7 +14,6 @@ app.add_url_rule('/', view_func=views.hello)
 app.add_url_rule('/wechat', view_func=views.wechat, methods=['GET', 'POST'])
 app.add_url_rule('/hello', view_func=views.hello)
 
-
 app.secret_key = app_config['secret_key']
 
 if __name__ == '__main__':

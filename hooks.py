@@ -5,6 +5,8 @@ from config import config
 from wechat import WeChatReply
 from flask import current_app as app
 
+_config = config.get('WeChat', None)
+_wechat = WeChat(_config)
 
 __all__ = ['simsimi_reply', 'normal_reply', 'event_reply']
 
@@ -63,7 +65,9 @@ def event_reply(**kw):
     msg = ''
     
     if event == u'subscribe':
-        content = u'感谢您关注阿扑娘滴新西兰纯净小店，请您持续关注这个公众号，也许你会发现惊喜。'
+        user = _wechat.getUserInfo(receiver)
+        content = u'你好 %s %s，感谢您关注阿扑娘滴新西兰纯净小店，请您持续关注这个公众号，也许你会发现惊喜。' % (user['nickname'], 
+                                                                                                                 user['warp_sex'])
         reply = WeChatReply(sender=sender, 
                             receiver=receiver,
                             type='text',

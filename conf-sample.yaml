@@ -9,9 +9,11 @@ secret_key: "securty"
 # for WeChat API
 ---
 TOKEN:      ""
+BASEAPI:    ""
 APPID:      ""
 APPSECRET:  ""
 EXPIRES_IN: 0
+
 
 # for SimSimi API
 ---
