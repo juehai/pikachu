@@ -91,6 +91,38 @@ class WeChat(object):
     def parse_text(self, raw):
         return {'content': raw.get('Content')}
 
+    def parse_image(self, raw):
+        return {'picurl': raw.get('PicUrl')}
+
+    def parse_location(self, raw):
+        return {
+            'location_x': raw.get('Location_X'),
+            'location_y': raw.get('Location_Y'),
+            'scale': int(raw.get('Scale', 0)),
+            'label': raw.get('Label'),
+        }
+
+    def parse_link(self, raw):
+        return {
+            'title': raw.get('Title'),
+            'description': raw.get('Description'),
+            'url': raw.get('url'),
+        }
+
+    def parse_event(self, raw):
+        return {
+            'event': raw.get('Event'),
+            'event_key': raw.get('EventKey'),
+            'ticket': raw.get('Ticket'),
+            'latitude': raw.get('Latitude'),
+            'longitude': raw.get('Longitude'),
+            'precision': raw.get('Precision'),
+        }
+
+    def parse_invalid_type(self, raw):
+        return {}
+
+
     def render(self, username, type='text', sender=None, **kwargs):
         assert(False)
 
