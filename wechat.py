@@ -86,7 +86,7 @@ class WeChat(object):
                   "secret"    : self.appsecret}
 
         try:
-            resp = requests.get(api, params, timeout=10)
+            resp = requests.get(api, params=params, timeout=10)
             ret = resp.json()
             timestamp = time.time()
             timeframe = {'timestamp': timestamp}
@@ -112,7 +112,7 @@ class WeChat(object):
                   "lang": lang}
 
         try:
-            resp = requests.get(api, params, timeout=10)
+            resp = requests.get(api, params=params, timeout=10)
             ret = resp.json()
             ret.update(dict(wrap_sex=self.sex_mapping[ret['sex']]))
         except Exception as e:
