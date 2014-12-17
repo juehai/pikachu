@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+import yaml
 import time
 import hashlib
 import requests
 from datetime import datetime
+import requests.packages.urllib3
+requests.packages.urllib3.disable_warnings()
 
 try:
     from lxml import etree
@@ -109,8 +112,8 @@ class WeChat(object):
         api = '%s/user/info' % self.baseapi
         access_token = self.getAccessToken()
         params = {"access_token": access_token, 
+                  "openid": openid,
                   "lang": lang}
-
         try:
             resp = requests.get(api, params=params, timeout=10)
             ret = resp.json()
