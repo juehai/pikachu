@@ -3,8 +3,10 @@ import time
 import requests
 from config import config
 from wechat import WeChatReply
+from flask import current_app as app
 
-__all__ = ['simsimi_reply', 'normal_reply']
+
+__all__ = ['simsimi_reply', 'normal_reply', 'event_reply']
 
 def simsimi_reply(**kw):
     _conf    = config.get('SIMSIMI', None)
@@ -27,7 +29,7 @@ def simsimi_reply(**kw):
         resp = requests.get(base_api, params=params, timeout=10)
         ret = resp.json()
     except Exception as e:
-        print 'SIMSIMI API was broking.'
+        app.logging.error('SimSimi API request failed.')
 
     if 'response' in ret:
         content = ret['response']
@@ -50,4 +52,22 @@ def normal_reply(**kw):
                         type=type,
                         content=content)
     msg = reply.text_reply()
+    return msg
+
+def event_reply(**kw):
+    sender = kw.get('receiver', '')
+    receiver = kw.get('sender', '')
+    event = kw.get('event', '')
+    type = kw.get('type', '')
+
+    msg = ''
+    
+    if event == u'subscribe':
+        content = u'感谢您关注阿扑娘滴新西兰纯净小店，请您持续关注这个公众号，也许你会发现惊喜。'
+        reply = WeChatReply(sender=sender, 
+                            receiver=receiver,
+                            type='text',
+                            content=content)
+        msg = reply.text_reply()
+    
     return msg

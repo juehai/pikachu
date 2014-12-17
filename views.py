@@ -11,13 +11,16 @@ __all__ = ['hello', 'wechat']
 _config = config.get('WeChat', None)
 _wechat = WeChat(_config)
 _wechat.register('*', simsimi_reply)
-_wechat.register('normal', normal_reply)
+#_wechat.register('normal', normal_reply)
+_wechat.register('event', event_reply)
 
 def hello():
     return "Hello, I'm Pikachu."
 
 def wechat():
-    app.logger.info('WeChat start.')
+    res = request.data
+    app.logger.debug('Response: %s' % res)
+
     signature = request.args.get('signature')
     timestamp = request.args.get('timestamp')
     nonce = request.args.get('nonce')
@@ -30,7 +33,8 @@ def wechat():
         return echostr
 
     try:
-        ret = _wechat.parse(request.data)
+        ret = _wechat.parse(res)
+        app.logger.debug("fmt_ret: %s" % ret)
     except:
         app.logger.error('Error: parse WeChat response fail.')
         return 'invalid', 400
@@ -40,16 +44,9 @@ def wechat():
         app.logger.error('Error: invalid WeChat response format data.')
         return 'invalid', 400
 
-    if ret['type'] == 'text' and ret['content'] in _wechat._hooks_mapping:
-        func = _wechat._hooks_mapping[ret['content']]
+    if ret['type'] == 'event' and 'event' in _wechat._hooks_mapping:
+       func = _wechat._hooks_mapping['event'] 
     else:
-        ret_set = frozenset(ret.items())
-        matched_rules = (
-            _func for _func, _limitation in _wechat._hooks
-            if _limitation.issubset(ret_set))
-        func = next(matched_rules, None)  # first matched rule
-
-    if func is None:
         if '*' in _wechat._hooks_mapping:
             func = _wechat._hooks_mapping['*']
         else:
@@ -58,11 +55,36 @@ def wechat():
     if callable(func):
         text = func(**ret)
     else:
-        # plain text
-        text = _wechat.reply(
-            username=ret['sender'],
-            sender=ret['receiver'],
-            content=func,
-        )
+        app.logger.debug('func: %s' % func)
+        return 'invalid', 500
 
     return Response(text, content_type='text/xml; charset=utf-8')
+            
+        
+
+##    if ret['type'] == 'text' and ret['content'] in _wechat._hooks_mapping:
+##        func = _wechat._hooks_mapping[ret['content']]
+##    else:
+##        ret_set = frozenset(ret.items())
+##        matched_rules = (
+##            _func for _func, _limitation in _wechat._hooks
+##            if _limitation.issubset(ret_set))
+##        func = next(matched_rules, None)  # first matched rule
+##
+##    if func is None:
+##        if '*' in _wechat._hooks_mapping:
+##            func = _wechat._hooks_mapping['*']
+##        else:
+##            func = 'failed'
+##
+##    if callable(func):
+##        text = func(**ret)
+##    else:
+##        # plain text
+##        text = _wechat.reply(
+##            username=ret['sender'],
+##            sender=ret['receiver'],
+##            content=func,
+##        )
+
+##    return Response(text, content_type='text/xml; charset=utf-8')
