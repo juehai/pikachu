@@ -10,6 +10,10 @@ _wechat = WeChat(_config)
 
 __all__ = ['simsimi_reply', 'normal_reply', 'event_reply']
 
+def no_reply(**kw):
+    return ''
+    
+
 def simsimi_reply(**kw):
     _conf    = config.get('SIMSIMI', None)
     base_api = _conf.get('API', None)

@@ -10,7 +10,7 @@ __all__ = ['hello', 'wechat']
 
 _config = config.get('WeChat', None)
 _wechat = WeChat(_config)
-_wechat.register('*', simsimi_reply)
+_wechat.register('*', no_reply)
 #_wechat.register('normal', normal_reply)
 _wechat.register('event', event_reply)
 
