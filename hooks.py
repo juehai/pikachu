@@ -38,7 +38,7 @@ def simsimi_reply(**kw):
         app.logging.error('SimSimi API request failed.')
 
     if 'response' in ret:
-        content = u'%s (这不是阿扑娘说的... :P )' % ret['response']
+        content = u'%s \n(扑小贱瞎叨叨... :P)' % ret['response']
 
     reply = WeChatReply(sender=sender, 
                         receiver=receiver,
