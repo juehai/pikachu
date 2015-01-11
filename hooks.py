@@ -63,7 +63,7 @@ def normal_reply(**kw):
 def event_reply(**kw):
     sender = kw.get('receiver', '')
     receiver = kw.get('sender', '')
-    event = kw.get('event', '')
+    event = kw.get('event', '').lower()
     type = kw.get('type', '')
 
     msg = ''
@@ -78,7 +78,7 @@ def event_reply(**kw):
         msg = reply.text_reply()
 
     if event == u'click':
-        event_key = kw.get('eventkey', '')
+        event_key = kw.get('event_key', '')
         if event_key == 'V1001_APUNIANG_CARD':
             reply = WeChatReply(sender=sender,
                                 receiver=receiver,
