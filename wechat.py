@@ -385,3 +385,8 @@ class WeChatReply(object):
         shared = self._shared_reply('text')
         template = '<xml>%s<Content><![CDATA[%s]]></Content></xml>'
         return template % (shared, self.content)
+
+    def image_reply(self):
+        shared = self._shared_reply('image')
+        template = '<xml>%s<Image><MediaId>%s</MediaId></Image></xml>'
+        return template % (shared, self.media_id)
