@@ -83,11 +83,11 @@ def event_reply(**kw):
             reply = WeChatReply(sender=sender,
                                 receiver=receiver,
                                 type='image',
-                                media_id='WWxozKqJ1Ztcm-WHhDFgwhZl7_4aKj8COmS55s64_omprESbb0xt7E5wUj-c7RvU')
+                                media_id='2NfvX9lC0H4HSUjjw3Zj_1H3-HWQrgSF3j3a4ZREH5KAJZg9gteUoOifVC4VI2Yi')
             msg = reply.image_reply()
         elif event_key == 'V1002_PRODUCT_PRICE':
             #user = _wechat.getUserInfo(receiver)
-            content = u'请联系直接联系美丽的阿扑娘,了解产品详情 ：）'
+            content = u'请直接联系美丽的 阿扑娘 了解产品详情，哈。点击菜单”找阿扑娘“获取 阿扑娘 的二维码 ：）'
             reply = WeChatReply(sender=sender,
                             receiver=receiver,
                             type='text',
