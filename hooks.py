@@ -38,7 +38,7 @@ def simsimi_reply(**kw):
         app.logging.error('SimSimi API request failed.')
 
     if 'response' in ret:
-        content = u'客服小黄鸡: %s' % ret['response']
+        content = u'%s (这不是阿扑娘说的... :P )' % ret['response']
 
     reply = WeChatReply(sender=sender, 
                         receiver=receiver,
@@ -70,7 +70,7 @@ def event_reply(**kw):
     
     if event == u'subscribe':
         user = _wechat.getUserInfo(receiver)
-        content = u'你好 %s<%s> 感谢您关注阿扑娘滴新西兰纯净小店，真心希望您持续关注这个公众号，也许您会发现更多惊喜 :)' % (user['wrap_sex'],user['nickname'])
+        content = u'你好 %s<%s> 感谢您关注阿扑娘滴新西兰纯净小店，真心希望您持续关注这个公众号，也许您会发现更多惊喜哟 :)' % (user['wrap_sex'],user['nickname'])
         reply = WeChatReply(sender=sender, 
                             receiver=receiver,
                             type='text',
@@ -87,14 +87,14 @@ def event_reply(**kw):
             msg = reply.image_reply()
         elif event_key == 'V1002_PRODUCT_PRICE':
             #user = _wechat.getUserInfo(receiver)
-            content = u'请直接联系美丽的 阿扑娘 了解产品详情，哈。点击菜单”找阿扑娘“获取 阿扑娘 的二维码 ：）'
+            content = u'请直接联系阿扑娘的微信号，点击菜单“找阿扑娘”可以获取到阿扑娘的二维码'
             reply = WeChatReply(sender=sender,
                             receiver=receiver,
                             type='text',
                             content=content)
             msg = reply.text_reply()
         elif event_key == 'V1003_BORED':
-            content = u'你确实挺无聊的，可是阿扑娘很忙，没空陪你聊天，哈。你还是跟客服小黄鸡逗逗乐子吧，哈。直接回复文字给这个公众号即可。'
+            content = u'你确实挺无聊的，可是阿扑娘很忙，没空陪你聊天，哈。你还是跟小贱客服逗逗乐子吧，哈。直接回复文字给这个公众号即可。'
             reply = WeChatReply(sender=sender,
                             receiver=receiver,
                             type='text',
