@@ -82,9 +82,15 @@ def event_reply(**kw):
         if event_key == 'V1001_APUNIANG_CARD':
             reply = WeChatReply(sender=sender,
                                 receiver=receiver,
-                                type='image',
-                                media_id='2NfvX9lC0H4HSUjjw3Zj_1H3-HWQrgSF3j3a4ZREH5KAJZg9gteUoOifVC4VI2Yi')
-            msg = reply.image_reply()
+                                type='news',
+                                articles = [dict(
+                                    title=u'【阿扑娘温馨提示】如何联系到美丽的阿扑娘',
+                                    desc=u'感谢亲们选择阿扑娘滴纯净小店，为了方便亲们更快的联系到阿扑娘，特此整理一个“如何快速联系到阿扑娘”的帖子～',
+                                    picurl='https://mmbiz.qlogo.cn/mmbiz/TOc9B287AvovPxmDU2NI148RjSQtmItpI4UGYgOAFM2UwhbWyUbx6Cquh6m8jibSew6ekibwStZwGhTj3PEJiak6g/0',
+                                    url='http://mp.weixin.qq.com/s?__biz=MzAxNzEzNDI1MQ==&mid=202754535&idx=1&sn=1c4eac7521c0ae226c364a0f2f39a40f#rd'),
+                                    ]
+                    )
+            msg = reply.news_reply()
         elif event_key == 'V1002_PRODUCT_PRICE':
             #user = _wechat.getUserInfo(receiver)
             content = u'请直接联系阿扑娘的微信号，点击菜单“找阿扑娘”可以获取到阿扑娘的二维码'

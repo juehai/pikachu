@@ -380,6 +380,17 @@ class WeChatReply(object):
             '<MsgType><![CDATA[%(type)s]]></MsgType>'
         )
         return template % dct
+
+    def _make_article(self, item):
+        template = (
+            '<item>'
+            '<Title><![CDATA[%(title)s]]></Title>'
+            '<Description><![CDATA[%(desc)s]]></Description>'
+            '<PicUrl><![CDATA[%(picurl)s]]></PicUrl>'
+            '<Url><![CDATA[%(url)s]]></Url>'
+            '</item>'
+        )
+        return template % item
    
     def text_reply(self):
         shared = self._shared_reply('text')
@@ -390,3 +401,9 @@ class WeChatReply(object):
         shared = self._shared_reply('image')
         template = '<xml>%s<Image><MediaId>%s</MediaId></Image></xml>'
         return template % (shared, self.media_id)
+
+    def news_reply(self):
+        shared = self._shared_reply('news')
+        template = '<xml>%s<ArticleCount>%s</ArticleCount><Articles>%s</Articles></xml>'
+        article_content = map(lambda item: self._make_article(item), self.articles)
+        return template % (shared, len(article_content), '\n'.join(article_content))
