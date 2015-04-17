@@ -7,10 +7,9 @@ def getConfig(cfile):
     config = dict()
     try:
         with open(cfile, 'rb') as f:
-            httpconf, wechat, simsimi = yaml.load_all(f.read())
-            config['HTTP'] = httpconf
-            config['WeChat'] = wechat
-            config['SIMSIMI'] = simsimi
+            sections = ['HTTP', 'WeChat', 'SIMSIMI']
+            c = yaml.load_all(f.read())
+            config = dict(zip(sections, c))
             f.close()
     except IOError as e:
         log.error(str(e))
@@ -23,4 +22,3 @@ def getConfig(cfile):
     return config
 
 config = getConfig('prod.yaml')
-

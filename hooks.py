@@ -107,3 +107,30 @@ def event_reply(**kw):
                             content=content)
             msg = reply.text_reply()
     return msg
+
+def system_control(**kw):
+    sender = kw.get('receiver', '')
+    receiver = kw.get('sender', '')
+    content = kw.get('content', '')
+    type = kw.get('type', '')
+
+    reply_content = 'Error: Unknown command.'
+
+    program, command = content.split('#')
+    if program == u'trademe':
+        try:
+            if command.lower() == 'stop':
+                os.system('/usr/local/bin/svc -d /service/trademe')
+                reply_content = 'Trademe Monitor has stoped.'
+            elif command.lower() == 'start':
+                os.system('/usr/local/bin/svc -u /service/trademe')
+                reply_content = 'Trademe Monitor has started.'
+        except Exception as e:
+            reply_content = 'Error: %s' % e
+    
+    reply = WeChatReply(sender=sender, 
+                        receiver=receiver,
+                        type=type,
+                        content=reply_content)
+    msg = reply.text_reply()
+    return msg

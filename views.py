@@ -14,6 +14,7 @@ _wechat = WeChat(_config)
 #_wechat.register('normal', normal_reply)
 _wechat.register('*', simsimi_reply)
 _wechat.register('event', event_reply)
+_wechat.register('trademe', system_control)
 
 def hello():
     return "Hello, I'm Pikachu."
@@ -46,7 +47,10 @@ def wechat():
         return 'invalid', 400
 
     if ret['type'] == 'event' and 'event' in _wechat._hooks_mapping:
-       func = _wechat._hooks_mapping['event'] 
+        func = _wechat._hooks_mapping['event'] 
+    if ret['content'].startswith('trademe#') and 
+        'trademe' in _wechat.hooks_mapping:
+        func = _wechat._hooks_mapping['trademe']
     else:
         if '*' in _wechat._hooks_mapping:
             func = _wechat._hooks_mapping['*']
