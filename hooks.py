@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
 import requests
+import os
 from config import config
 from wechat import WeChat, WeChatReply
 from flask import current_app as app
