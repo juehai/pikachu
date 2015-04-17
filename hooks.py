@@ -8,7 +8,7 @@ from flask import current_app as app
 _config = config.get('WeChat', None)
 _wechat = WeChat(_config)
 
-__all__ = ['no_reply', 'simsimi_reply', 'normal_reply', 'event_reply']
+__all__ = ['no_reply', 'simsimi_reply', 'normal_reply', 'event_reply', 'system_control']
 
 def no_reply(**kw):
     return ''
