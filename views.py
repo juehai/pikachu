@@ -48,7 +48,7 @@ def wechat():
 
     if ret['type'] == 'event' and 'event' in _wechat._hooks_mapping:
         func = _wechat._hooks_mapping['event'] 
-    if ret['content'].startswith('trademe#') and 'trademe' in _wechat.hooks_mapping:
+    elif ret['content'].startswith('trademe#') and 'trademe' in _wechat.hooks_mapping:
         func = _wechat._hooks_mapping['trademe']
     else:
         if '*' in _wechat._hooks_mapping:
