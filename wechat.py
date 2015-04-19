@@ -90,7 +90,7 @@ class WeChat(object):
                   "secret"    : self.appsecret}
 
         try:
-            resp = requests.get(api, params=params, timeout=10)
+            resp = requests.get(api, params=params, timeout=10, verify=False)
             ret = resp.json()
             timestamp = time.time()
             timeframe = {'timestamp': timestamp}
@@ -116,7 +116,7 @@ class WeChat(object):
                   "openid": openid,
                   "lang": lang}
         try:
-            resp = requests.get(api, params=params, timeout=10)
+            resp = requests.get(api, params=params, timeout=10, verify=False)
             ret = resp.json()
             ret.update(dict(wrap_sex=self.sex_mapping[ret['sex']]))
         except Exception as e:
@@ -143,9 +143,13 @@ class WeChat(object):
                         data=json.dumps(payload), 
                         params={'access_token': access_token}, 
                         timeout=10,
-                        headers={'Content-Type': 'text/html;charset=utf-8'})
-            print api, access_token, json.dumps(payload)
-            print resp.text
+                        verify=False)
+
+            # Notice: from https://github.com/kennethreitz/requests/issues/1604
+            # If http server returns Content-type: text/* without encoding, Response.text always
+            # decode it as 'ISO-8859-1' text. So We have to encode('ISO-8859-1') at first, then 
+            # decode to utf-8. Otherwise, we have to set response encoding to utf-8.
+            resp.encoding = 'utf-8' 
             ret = resp.json()
         except Exception as e:
             raise RuntimeError('WeChat api(getMaterialsList) failed.')
