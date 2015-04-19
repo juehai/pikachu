@@ -3,6 +3,7 @@ import yaml
 import time
 import hashlib
 import requests
+import json
 from datetime import datetime
 import requests.packages.urllib3
 requests.packages.urllib3.disable_warnings()
@@ -70,7 +71,7 @@ class WeChat(object):
         try:
             with open('.access_token', 'r') as f:
                 _ret = yaml.load(f.read())
-                delta = time.time() - timestamp
+                delta = time.time() - _ret['timestamp']
                 if delta < 0:
                     # fake timestamp
                     raise
@@ -121,6 +122,44 @@ class WeChat(object):
         except Exception as e:
             raise RuntimeError('WeChat api(getUserInfo) failed.')
 
+        return ret
+
+    def getMaterialsList(self, mtype, offset=0, count=20, get_all=False):
+        '''
+        Document: http://mp.weixin.qq.com/wiki/12/2108cd7aafff7f388f41f37efa710204.html
+        @mtype :: image | video | voice | news
+        @offset :: start from 0
+        @count :: range in 1-20
+        '''
+        api = '%s/material/batchget_material' % self.baseapi
+        access_token = self.getAccessToken()
+        payload = {
+                  'type': mtype,
+                  'offset': offset,
+                  'count': count,
+                 }
+        try:
+            resp = requests.post(api, 
+                        data=json.dumps(payload), 
+                        params={'access_token': access_token}, 
+                        timeout=10,
+                        headers={'Content-Type': 'text/html;charset=utf-8'})
+            print api, access_token, json.dumps(payload)
+            print resp.text
+            ret = resp.json()
+        except Exception as e:
+            raise RuntimeError('WeChat api(getMaterialsList) failed.')
+
+        if get_all:
+            from math import ceil
+            total_count = ret['total_count']
+            offset, count = 0, 20
+            pages = int(ceil(total_count / float(count)))
+            for page in range(pages):
+                if page == 0: continue # because page 1 has already got it.
+                _ret = self.getMaterialsList(mtype, page*count, count, get_all=False)
+                ret['item_count'] += int(_ret['item_count'])
+                ret['item'] += _ret['item']
         return ret
         
 
