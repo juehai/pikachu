@@ -109,6 +109,45 @@ def event_reply(**kw):
             msg = reply.text_reply()
     return msg
 
+def material_search(**kw):
+    from search_engine import get_myindex, search
+    from whoosh import sorting
+
+    _config = config.get('WeChat', None)
+    indexdir = _config['INDEX_DIR']
+
+    sender = kw.get('receiver', '')
+    receiver = kw.get('sender', '')
+    content = kw.get('content', '')
+    type = kw.get('type', '')
+
+    ix = get_myindex(indexdir=indexdir)
+    date_facet = sorting.FieldFacet("update_time", reverse=True)
+    scores = sorting.ScoreFacet()
+    # results should limit below 10 contents,
+    # that restriction was made by WeChat API.
+    results = search(ix, content, sortedby=[date_facet, scores], limit=10)
+    if results:
+        articles = list()
+        articles = map(lambda hit: dict(title=hit['title'],
+                                        desc=hit['summary'],
+                                        picurl=hit['show_cover_pic'],
+                                        url=hit['url']), results)
+        reply = WeChatReply(sender=sender,
+                            receiver=receiver,
+                            type='news',
+                            articles = articles
+                )
+        msg = reply.news_reply()
+    else:
+        content = u'没有找到含有关键词" %s "的文章, 请联系阿扑娘询问正确的关键词.'
+        reply = WeChatReply(sender=sender,
+                            receiver=receiver,
+                            type='text',
+                            content=content)
+        msg = reply.text_reply()
+    return msg
+
 def system_control(**kw):
     sender = kw.get('receiver', '')
     receiver = kw.get('sender', '')
