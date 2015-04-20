@@ -51,7 +51,7 @@ def create_index(docs, indexdir='indexdir'):
         writer.mergetype = writing.CLEAR
 
 def split_keywords(qstring):
-    keywords = jieba.cut_for_search(query_string)
+    keywords = jieba.cut_for_search(qstring)
     keywords = [ kw.strip() for kw in keywords if kw.strip() != '' ]
     return keywords
     
