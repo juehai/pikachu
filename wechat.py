@@ -183,6 +183,23 @@ class WeChat(object):
             raise RuntimeError('WeChat api(getMaterialCount) failed.')
         return ret
 
+    def getMaterial(self, media_id):
+        api = '%s/material/get_material' % self.baseapi
+        access_token = self.getAccessToken()
+        params = {'access_token': access_token}
+        ret = dict()
+        try:
+            resp = requests.post(api, data=json.dumps(dict(media_id=media_id)),
+                                params=params, timeout=10, verify=False)
+            # TODO: if material's type is news or video, API will return json.
+            #       Damn API's developers.
+            # 
+            ## resp.encoding = 'utf-8'
+            ## ret = resp.json()
+        except Exception as e:
+            raise RuntimeError('WeChat api(getMaterial) failed.')
+        return ret
+
     def parse(self, content):
         """Parse xml body sent by WeChat.
 

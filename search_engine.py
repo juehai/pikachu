@@ -22,6 +22,7 @@ def get_schema():
                     url=STORED, 
                     content_source_url=STORED,
                     show_cover_pic=STORED,
+                    cover_pic_url=STORED,
                     summary=TEXT(stored=True, analyzer=analyzer), 
                     content = TEXT(stored=True, analyzer=analyzer),
                     update_time=DATETIME)
