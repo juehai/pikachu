@@ -136,7 +136,7 @@ def material_search(**kw):
         articles = list()
         articles = map(lambda hit: dict(title=hit['title'],
                                         desc=hit['summary'],
-                                        picurl=hit['show_cover_pic'],
+                                        picurl=hit['cover_pic_url'],
                                         url=hit['url']), results)
         app.logger.debug('---> picurl: %s' % articles[0]['picurl'])
         reply = WeChatReply(sender=sender,
