@@ -1,2 +1,5 @@
 *.pyc
 prod.yaml
+.access_token
+*.*~
+*.swp
