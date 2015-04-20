@@ -8,11 +8,12 @@ secret_key: "securty"
 
 # for WeChat API
 ---
-TOKEN:      ""
-BASEAPI:    ""
-APPID:      ""
+TOKEN:      "" # from wechat token
+BASEAPI:    "" # probably is https://api.weixin.qq.com/cgi-bin
+APPID:      "" 
 APPSECRET:  ""
-EXPIRES_IN: 0
+EXPIRES_IN: 0  # if 0 that means never expired.
+INDEX_DIR: "/tmp/indexdir" # this is for whoosh index dir
 
 
 # for SimSimi API
