@@ -49,12 +49,17 @@ def create_index(docs, indexdir='indexdir'):
             writer.add_document(**doc)
         writer.mergetype = writing.CLEAR
 
+def split_keywords(qstring):
+    keywords = jieba.cut_for_search(query_string)
+    keywords = [ kw.strip() for kw in keywords if kw.strip() != '' ]
+    return keywords
+    
+
 def search(ix, query_string, sortedby=None, limit=10):
     mp = MultifieldParser(["title", "summary"], schema=ix.schema)
     
     s = ix.searcher()
-    keywords = jieba.cut_for_search(query_string)
-    keywords = [ kw.strip() for kw in keywords if kw.strip() != '' ]
+    keywords = split_keywords(query_string)
     user_q = mp.parse(' OR '.join(keywords))
     # TODO: add query filter
     results = s.search(user_q, sortedby=sortedby, limit=limit)
