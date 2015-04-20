@@ -111,7 +111,7 @@ def event_reply(**kw):
     return msg
 
 def material_search(**kw):
-    from search_engine import get_myindex, search
+    from search_engine import get_myindex, search, split_keywords
     from whoosh import sorting
 
     _config = config.get('WeChat', None)
@@ -127,6 +127,10 @@ def material_search(**kw):
     scores = sorting.ScoreFacet()
     # results should limit below 10 contents,
     # that restriction was made by WeChat API.
+    if app.debug:
+        keywords = split_keywords(content)
+        app.logger.debug('----> query_string: %s' % ', '.join(keywords))
+    
     results = search(ix, content, sortedby=[date_facet, scores], limit=10)
     if results:
         articles = list()
@@ -134,6 +138,7 @@ def material_search(**kw):
                                         desc=hit['summary'],
                                         picurl=hit['show_cover_pic'],
                                         url=hit['url']), results)
+        app.logger.debug('---> picurl: %s' % articles[0]['picurl'])
         reply = WeChatReply(sender=sender,
                             receiver=receiver,
                             type='news',
@@ -141,7 +146,8 @@ def material_search(**kw):
                 )
         msg = reply.news_reply()
     else:
-        content = u'没有找到含有关键词" %s "的文章, 请联系阿扑娘询问正确的关键词.'
+        keywords = split_keywords(content)
+        content = u'没有找到含有关键词" %s "的文章, 请联系阿扑娘询问正确的关键词.' % ','.join(keywords)
         reply = WeChatReply(sender=sender,
                             receiver=receiver,
                             type='text',
