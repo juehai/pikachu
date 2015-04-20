@@ -165,7 +165,23 @@ class WeChat(object):
                 ret['item_count'] += int(_ret['item_count'])
                 ret['item'] += _ret['item']
         return ret
-        
+
+    def getMaterialCount(self):
+        '''
+            See document from http://mp.weixin.qq.com/wiki/16/8cc64f8c189674b421bee3ed403993b8.html
+            ::return::  voice_count & video_count & image_count & news_count in a dict.
+        '''
+        api = '%s/material/get_materialcount' % self.baseapi
+        access_token = self.getAccessToken()
+        params = {'access_token': access_token}
+        ret = dict()
+        try:
+            resp = requests.get(api, params=params, timeout=10, verify=False)
+            resp.encoding = 'utf-8'
+            ret = resp.json()
+        except Exception as e:
+            raise RuntimeError('WeChat api(getMaterialCount) failed.')
+        return ret
 
     def parse(self, content):
         """Parse xml body sent by WeChat.
