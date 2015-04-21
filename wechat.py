@@ -67,9 +67,11 @@ class WeChat(object):
         return signature == hsh
 
     def getAccessToken(self):
+        current_dir = os.path.dirname(os.path.realpath(__file__))
+        cache_file = current_dir + '.access_token'
         # get access token from cache
         try:
-            with open('.access_token', 'r') as f:
+            with open(cache_file, 'r') as f:
                 _ret = yaml.load(f.read())
                 delta = time.time() - _ret['timestamp']
                 if delta < 0:
@@ -100,7 +102,7 @@ class WeChat(object):
 
         # cache access token
         try:
-            with open('.access_token', 'w+') as f:
+            with open(cache_file, 'w+') as f:
                 f.write(yaml.dump(ret))
                 f.close()
         except IOError as e:
