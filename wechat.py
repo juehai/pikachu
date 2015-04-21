@@ -68,7 +68,7 @@ class WeChat(object):
 
     def getAccessToken(self):
         current_dir = os.path.dirname(os.path.realpath(__file__))
-        cache_file = current_dir + '.access_token'
+        cache_file = current_dir + '/.access_token'
         # get access token from cache
         try:
             with open(cache_file, 'r') as f:

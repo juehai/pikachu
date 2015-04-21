@@ -21,4 +21,6 @@ def getConfig(cfile):
         raise
     return config
 
-config = getConfig('prod.yaml')
+current_dir = os.path.dirname(os.path.realpath(__file__))
+config_file = current_dir + '/prod.yaml'
+config = getConfig(config_file)
