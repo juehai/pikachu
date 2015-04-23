@@ -1,5 +1,6 @@
 *.pyc
-prod.yaml
+*.yaml
 .access_token
 *.*~
 *.swp
+*.cache

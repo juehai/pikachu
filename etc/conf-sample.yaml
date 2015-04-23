@@ -1,0 +1,24 @@
+# for HTTP server
+---
+host:       "127.0.0.1"
+port:       9999
+debug:      True
+max_threads: 10
+secret_key: "securty"
+
+
+# for WeChat API
+---
+TOKEN:      "" # from wechat token
+BASEAPI:    "" # probably is https://api.weixin.qq.com/cgi-bin
+APPID:      "" 
+APPSECRET:  ""
+EXPIRES_IN: 0  # if 0 that means never expired.
+INDEX_DIR: "/tmp/indexdir" # this is for whoosh index dir
+
+
+# for SimSimi API
+---
+API: "http://sandbox.api.simsimi.com/request.p"
+Key: "53954a78-a2f8-4465-89b0-92957b95758e"
+TIMEOUT: 10
