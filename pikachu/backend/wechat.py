@@ -7,7 +7,7 @@ from datetime import datetime
 from pikachu import httpclient
 from pikachu import json_encode, json_decode
 
-from twisted.internet import defer, returnValue
+from twisted.internet import defer
 
 try:
     from lxml import etree
@@ -62,7 +62,7 @@ class WeChatSDK(object):
 
         return signature == hsh
 
-    @static
+    @staticmethod
     def parse(self, content):
         def _format(args):
             timestamp = int(args.get('CreateTime', 0))
@@ -126,7 +126,7 @@ class WeChatSDK(object):
     def _parse_invalid_type(self, raw):
         return {}
 
-    @defer.inlinecallbacks
+    @defer.inlineCallbacks
     def getAccessToken(self):
         api = '%s/token' % self.baseapi
         params = dict(
@@ -134,12 +134,15 @@ class WeChatSDK(object):
             appid = self.appid,
             secret = self.appsecret,
         )
+        #from twisted.web.client import getPage
+        #from urllib import urlencode
+        #api = '%s?%s' % (api, urlencode(params))
+
         page = yield httpclient(api, method=b'GET', params=params)
         ret = json_decode(page)
         timestamp = time.time()
         ret.update(dict(timestamp=timestamp))
-        returnValue(ret)
-
+        defer.returnValue(ret)
 
     def getUserInfo(self, openid, lang='zh_CN'):
         pass
@@ -152,6 +155,10 @@ class WeChatSDK(object):
 
     def getMaterial(self, media_id):
         pass
+
+def display(val, *args, **kw):
+    print str(val)
+    reactor.stop()
 
 if __name__ == '__main__':
     pass

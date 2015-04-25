@@ -18,7 +18,7 @@ def _encode_params(data):
         return data
     elif hasattr(data, 'read'):
         return data
-    elif hassattr(data, '__iter__'):
+    elif hasattr(data, '__iter__'):
         result = []
         for k, vs in data.items():
             if isinstance(vs, basestring) or not hasattr(vs, '__iter__'):
@@ -28,7 +28,7 @@ def _encode_params(data):
                     result.append(
                         (k.encode('utf-8') if isinstance(k, str) else k,
                          v.encode('utf-8') if isinstance(v, str) else v))
-            return urlencode(result, doseq=True)
+        return urlencode(result, doseq=True)
     else:
         return data
 
@@ -39,7 +39,7 @@ def httpclient(url, **kw):
     if not 'agent' in kw:
         kw['agent'] = b'Pikachu Message Gateway HttpClient v0.1'
     if not 'timeout' in kw:
-        kw['timeout'] = 10,
+        kw['timeout'] = 10
     if not 'followRedirect' in kw:
         kw['followRedirect'] = True
     if not 'redirectLimit' in kw:
@@ -62,6 +62,5 @@ def httpclient(url, **kw):
                 query = enc_params
 
         url = Url(scheme, auth, host, port, path, query, fragment).url
-
     d = getPage(url, **kw)
     return d
