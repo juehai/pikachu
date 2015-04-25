@@ -1,12 +1,12 @@
 ## WeChat message gateway
 
 = Purpose =
-* Simplifying response from WeChat API
-* Spliting backend process to module function
+* Simplifying the response from WeChat API
+* Spliting the backend process to different module functions
 * Tidying code up.
 
 == Framework and backend ==
 
 * Twisted
 * Celery
-* Redies
+* Redis
