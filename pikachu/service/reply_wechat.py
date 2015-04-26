@@ -18,7 +18,7 @@ class ReplyWeChatService(Resource):
         Resource.__init__(self, *args, **kwargs)
         self.config = c
 
-    def parese(self, request):
+    def parse(self, request):
         request.content.seek(0, 0)
         content = request.content.read()
         debug("content size = %d" % len(content))
