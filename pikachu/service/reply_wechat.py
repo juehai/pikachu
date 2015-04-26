@@ -62,7 +62,7 @@ class ReplyWeChatService(Resource):
         nonce  = request.args.get('nonce', '')
         wechat = WeChatSDK()
         if not wechat.validate(signature, timestamp, nonce):
-            error_message = "sign: %s, timestamp: %s, nonce: %" % (signature,
+            error_message = "sign: %s, timestamp: %s, nonce: %s" % (signature,
                                                                    timestamp,
                                                                    nonce)
             raise WeChatValidateError(error_message)
