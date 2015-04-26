@@ -8,7 +8,9 @@ from twisted.internet.threads import deferToThread
 from twisted.python.failure import Failure
 
 from pikachu.log import *
-from pikachu.backend.wechat import WeChatSDK, WeChatValidateError
+from pikachu.backend.wechat import WeChatSDK
+from pikachu.backend.wechat import WeChatValidateError
+from pikachu.backend.wechat import WeChatReply
 
 class ReplyWeChatService(Resource):
     isLeaf = True
@@ -29,7 +31,7 @@ class ReplyWeChatService(Resource):
 
     def finish(self, value, request):
         #request.setHeader('Content-Type', 'application/xhtml+xml; charset=UTF-8')
-        request.setHeader('Content-Type', 'text/html; charset=UTF-8')
+        request.setHeader('Content-Type', 'text/xml; charset=UTF-8')
         if isinstance(value, Failure):
             err = value.value
             request.setResponseCode(500)
@@ -37,39 +39,52 @@ class ReplyWeChatService(Resource):
                 request.setResponseCode(400)
                 request.write('Signature validate failed.')
             else:
-                error = str(err)
+                err_msg = str(err)
                 error('v'*50)
                 value.printTraceback()
                 error('^'*50)
-                request.write(error + "\n")
+                request.write(err_msg + "\n")
         else:
             request.setResponseCode(200)
-            request.write("%s\n" % value)
+            debug("value type: %s" % type(value))
+            debug(value)
+            request.write(value.encode('utf-8'))
         request.finish()
 
-    @defer.inlineCallbacks
+    def normal_reply(self, **kw):
+        sender = kw.get('receiver', '')
+        receiver = kw.get('sender', '')
+        content = kw.get('content', '')
+        mtype = kw.get('mtype', '')
+
+        _reply = WeChatReply(sender=sender,
+                            receiver=receiver,
+                            mtype=mtype,
+                            content=content)
+        msg = _reply.text_reply()
+        return msg
+
     def reply(self, res, request):
         msg_type = res.get('mtype', '').lower()
-        if msg_type == 'event':
-            pass
-        else:
-            content = res.get('content', '')
-        defer.returnValue(content)
+        debug("mtype: %s" % msg_type)
+        ret = self.normal_reply(**res)
+        debug("ret type: %s" % type(ret))
+        return ret
 
     def cancel(self, err, call):
         call.cancel()
 
     def render_GET(self, request):
-        signature = request.args.get('signature', [''])[0]
-        timestamp  = request.args.get('timestamp', [''])[0]
-        nonce  = request.args.get('nonce', [''])[0]
-        wechat = WeChatSDK()
-        if not wechat.validate(signature, timestamp, nonce):
-            error_message = "sign: %s, timestamp: %s, nonce: %s" % (signature,
-                                                                   timestamp,
-                                                                   nonce)
-            raise WeChatValidateError(error_message)
+        echostr = request.args.get('echostr', [''])[0]
+        d = self.parse(request)
+        request.notifyFinish().addErrback(self.cancel, d)
+        d.addCallback(lambda x: echostr)
+        d.addBoth(self.finish, request)
+        return NOT_DONE_YET
 
+    def render_POST(self, request):
+        # TODO: If message with Chinese, it always got a encode error
+        # but I haven't found where got mistake.
         d = self.parse(request)
         request.notifyFinish().addErrback(self.cancel, d)
         d.addCallback(self.reply, request)

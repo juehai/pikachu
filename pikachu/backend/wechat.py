@@ -68,7 +68,6 @@ class WeChatSDK(object):
 
         return signature == hsh
 
-    @staticmethod
     def parse(self, content):
         def _format(args):
             timestamp = int(args.get('CreateTime', 0))
