@@ -5,6 +5,7 @@ port:       9999
 debug:      True
 max_threads: 10
 secret_key: "securty"
+redis_host: "127.0.0.1:6379"
 
 
 # for WeChat API

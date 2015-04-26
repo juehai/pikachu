@@ -6,6 +6,8 @@ import time
 from datetime import datetime
 from pikachu import httpclient
 from pikachu import json_encode, json_decode
+from pikachu.backend.redis import dStore
+from pikachu.log import *
 
 from twisted.internet import defer
 
@@ -22,15 +24,19 @@ class WeChatRuntimeError(Exception):
 class WeChatValidateError(WeChatRuntimeError):
     pass
 
+class WeChatInvalidCache(WeChatRuntimeError):
+    pass
+
 class WeChatSDK(object):
     baseapi = 'https://api.weixin.qq.com/cgi-bin'
 
-    def __init__(self, token='', appid='',
-                 appsecret='', expires_in=0):
-        self.token = token
-        self.appid = appid
-        self.appsecret = appsecret
-        self.expires_in = expires_in
+    @classmethod
+    def setup(cls, token='', appid='',
+              appsecret='', expires_in=0):
+        WeChatSDK.token = token
+        WeChatSDK.appid = appid
+        WeChatSDK.appsecret = appsecret
+        WeChatSDK.expires_in = expires_in
 
     def validate(self, signature, timestamp, nonce):
         '''
@@ -127,22 +133,48 @@ class WeChatSDK(object):
         return {}
 
     @defer.inlineCallbacks
-    def getAccessToken(self):
+    def _getAccessToken(self):
+        # request access token
         api = '%s/token' % self.baseapi
         params = dict(
             grant_type = 'client_credential',
             appid = self.appid,
             secret = self.appsecret,
         )
-        #from twisted.web.client import getPage
-        #from urllib import urlencode
-        #api = '%s?%s' % (api, urlencode(params))
 
         page = yield httpclient(api, method=b'GET', params=params)
         ret = json_decode(page)
         timestamp = time.time()
         ret.update(dict(timestamp=timestamp))
+
         defer.returnValue(ret)
+
+
+    @defer.inlineCallbacks
+    def getAccessToken(self):
+        # get from cache
+        try:
+            _cache = yield dStore.hmget_cache('access_token')
+            delta = time.time() - _cache.get('timestamp', 0)
+            expires_in = int(_cache.get('expires_in', 7200))
+            if delta < 0:
+                #fake timestamp
+                raise WeChatInvalidCache('Fake timestamp.')
+            elif delta > expires_in:
+                raise WeChatInvalidCache('Cache expires in %s senconds.' % expires_in)
+            debug('got Access Token from cache.')
+            defer.returnValue(_cache)
+        except WeChatInvalidCache as e:
+            debug('got Access Token from cache failed.')
+            pass
+        except Exception as e:
+            error(str(e))
+            raise e
+
+        # refrush cache
+        raw = yield self._getAccessToken() # request access token
+        ret = yield dStore.hmset_cache('access_token', raw)
+        defer.returnValue(raw)
 
     def getUserInfo(self, openid, lang='zh_CN'):
         pass
@@ -155,10 +187,6 @@ class WeChatSDK(object):
 
     def getMaterial(self, media_id):
         pass
-
-def display(val, *args, **kw):
-    print str(val)
-    reactor.stop()
 
 if __name__ == '__main__':
     pass
