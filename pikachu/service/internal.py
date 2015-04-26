@@ -16,6 +16,11 @@ class InternalService(Resource):
         Resource.__init__(self, *args, **kwargs)
         self.config = c
 
+    def render_GET(self, request):
+        request.setResponseCode(403)
+        request.write("You can NOT visit this service!")
+        request.finish()
+        return NOT_DONE_YET
 
 class AccessTokenService(Resource):
     isLeaf = True

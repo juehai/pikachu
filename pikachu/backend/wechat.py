@@ -73,11 +73,11 @@ class WeChatSDK(object):
         def _format(args):
             timestamp = int(args.get('CreateTime', 0))
             _ = dict(
-                id = args.get('MsgId', ''),
+                mid = args.get('MsgId', ''),
                 timestamp=timestamp,
                 receiver=args.get('ToUserName'),
                 sender=args.get('FromUserName'),
-                type=args.get('MsgType'),
+                mtype=args.get('MsgType'),
                 time=datetime.fromtimestamp(timestamp),
             )
             return _
@@ -88,7 +88,7 @@ class WeChatSDK(object):
             raw[child.tag] = child.text
         formatted = _format(raw)
 
-        msg_type = formatted.get('type', 'invalid_type')
+        msg_type = formatted.get('mtype', 'invalid_type')
         msg_parser = getattr(self, '_parse_%s' % msg_type, None)
         if callable(msg_parser):
             parsed = msg_parser(raw)
@@ -187,6 +187,60 @@ class WeChatSDK(object):
 
     def getMaterial(self, media_id):
         pass
+
+
+class WeChatReply(object):
+
+    def __init__(self, sender=None, receiver=None, mtype=None, **kw):
+        self.sender = sender
+        self.receiver = receiver
+        self.mtype = mtype
+
+        for k, v in kw.items():
+            setattr(self, k, v)
+
+    def _shared_reply(self, mtype):
+        dct = {
+            'username': self.receiver,
+            'sender': self.sender,
+            'type': mtype,
+            'timestamp': int(time.time()),
+        }
+        template = (
+            '<ToUserName><![CDATA[%(username)s]]></ToUserName>'
+            '<FromUserName><![CDATA[%(sender)s]]></FromUserName>'
+            '<CreateTime>%(timestamp)d</CreateTime>'
+            '<MsgType><![CDATA[%(type)s]]></MsgType>'
+        )
+        return template % dct
+
+    def _make_article(self, item):
+        template = (
+            '<item>'
+            '<Title><![CDATA[%(title)s]]></Title>'
+            '<Description><![CDATA[%(desc)s]]></Description>'
+            '<PicUrl><![CDATA[%(picurl)s]]></PicUrl>'
+            '<Url><![CDATA[%(url)s]]></Url>'
+            '</item>'
+        )
+        return template % item
+
+    def text_reply(self):
+        shared = self._shared_reply('text')
+        template = '<xml>%s<Content><![CDATA[%s]]></Content></xml>'
+        return template % (shared, self.content)
+
+    def image_reply(self):
+        shared = self._shared_reply('image')
+        template = '<xml>%s<Image><MediaId>%s</MediaId></Image></xml>'
+        return template % (shared, self.media_id)
+
+    def news_reply(self):
+        shared = self._shared_reply('news')
+        template = '<xml>%s<ArticleCount>%s</ArticleCount><Articles>%s</Articles></xml>'
+        article_content = map(lambda item: self._make_article(item), self.articles)
+        return template % (shared, len(article_content), '\n'.join(article_content))
+
 
 if __name__ == '__main__':
     pass
