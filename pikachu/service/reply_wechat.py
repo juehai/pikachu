@@ -38,6 +38,9 @@ class ReplyWeChatService(Resource):
                 request.write('Signature validate failed.')
             else:
                 error = str(err)
+                error('v'*50)
+                value.printTraceback()
+                error('^'*50)
                 request.write(error + "\n")
         else:
             request.setResponseCode(200)
