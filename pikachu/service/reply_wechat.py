@@ -57,9 +57,9 @@ class ReplyWeChatService(Resource):
         call.cancel()
 
     def render_GET(self, request):
-        signature = request.args.get('signature', '')
-        timestamp  = request.args.get('timestamp', '')
-        nonce  = request.args.get('nonce', '')
+        signature = request.args.get('signature', [''])[0]
+        timestamp  = request.args.get('timestamp', [''])[0]
+        nonce  = request.args.get('nonce', [''])[0]
         wechat = WeChatSDK()
         if not wechat.validate(signature, timestamp, nonce):
             error_message = "sign: %s, timestamp: %s, nonce: %s" % (signature,
