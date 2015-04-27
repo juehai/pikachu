@@ -11,10 +11,11 @@ from pikachu.log import *
 from pikachu.backend.wechat import WeChatSDK
 from pikachu.backend.wechat import WeChatValidateError
 from pikachu.backend.wechat import WeChatReply
+from pikachu.action.wechatbot import WeChatBot 
 
-class ReplyWeChatService(Resource):
+class RespondWeChatService(Resource):
     isLeaf = True
-    serviceName = "reply_wechat"
+    serviceName = "respond_wechat"
 
     def __init__(self, c, *args, **kwargs):
         Resource.__init__(self, *args, **kwargs)
@@ -51,25 +52,10 @@ class ReplyWeChatService(Resource):
             request.write(value.encode('utf-8'))
         request.finish()
 
-    def normal_reply(self, **kw):
-        sender = kw.get('receiver', '')
-        receiver = kw.get('sender', '')
-        content = kw.get('content', '')
-        mtype = kw.get('mtype', '')
-
-        _reply = WeChatReply(sender=sender,
-                            receiver=receiver,
-                            mtype=mtype,
-                            content=content)
-        msg = _reply.text_reply()
-        return msg
-
-    def reply(self, res, request):
-        msg_type = res.get('mtype', '').lower()
-        debug("mtype: %s" % msg_type)
-        ret = self.normal_reply(**res)
-        debug("ret type: %s" % type(ret))
-        return ret
+    def respond(self, res, request):
+        robot = Talkbot()
+        content = robot.reflect(**res)
+        return content
 
     def cancel(self, err, call):
         call.cancel()
@@ -87,6 +73,6 @@ class ReplyWeChatService(Resource):
         # but I haven't found where got mistake.
         d = self.parse(request)
         request.notifyFinish().addErrback(self.cancel, d)
-        d.addCallback(self.reply, request)
+        d.addCallback(self.respond, request)
         d.addBoth(self.finish, request)
         return NOT_DONE_YET

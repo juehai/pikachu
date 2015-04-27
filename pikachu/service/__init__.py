@@ -2,7 +2,7 @@ from twisted.web import resource
 from pikachu.service.hello import HelloService
 from pikachu.service.internal import InternalService
 from pikachu.service.internal import AccessTokenService
-from pikachu.service.reply_wechat import ReplyWeChatService
+from pikachu.service.respond import RespondWeChatService
 
 __all__ = ['site_configure']
 

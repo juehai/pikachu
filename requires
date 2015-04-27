@@ -1,0 +1,8 @@
+twisted
+ujson
+txredisapi
+mako
+
+urllib3
+service_identity
+pyyaml

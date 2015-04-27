@@ -9,6 +9,14 @@ from urllib3.util import parse_url
 from urllib3.util.url import Url
 from urllib3.exceptions import LocationParseError
 
+class PikachuConfig(object):
+
+    @classmethod
+    def configure(cls, cfile):
+        with codecs.open(cfile, 'r', encoding='utf-8') as f:
+            (cls.http, cls.wechat,
+             cls.simsimi, cls.celery) = yaml.load_all(f.read())
+
 
 class InvalidURL(Exception):
     pass

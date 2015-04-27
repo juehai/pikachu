@@ -17,10 +17,6 @@ class Options(usage.Options):
         ["host", "i", 0, "The host ip to set up."],
     ]
 
-YAMLConfiguration = namedtuple("YAMLConfiguration",
-                               ['http', 'wechat', 'simsimi', 'celery'])
-
-
 class PikachuServiceMaker(object):
     implements(IServiceMaker, IPlugin)
 
@@ -28,19 +24,12 @@ class PikachuServiceMaker(object):
     description = "pikachu WeChat message gateway"
     options = Options
 
-    def configure(self, c):
-        with codecs.open(c, "r", encoding="utf-8") as f:
-            http, wechat, simsimi, celery = yaml.load_all(f.read())
-
-        return YAMLConfiguration(http=http,
-                                 wechat=wechat,
-                                 simsimi=simsimi,
-                                 celery=celery)
-
     def makeService(self, options):
         c = options["config"]
 
-        config = self.configure(c)
+        from pikachu import PikachuConfig
+        config = PikachuConfig.configure(c)
+
         from pikachu.service import site_configure
         site_root = site_configure(config)
         from twisted.web import server
