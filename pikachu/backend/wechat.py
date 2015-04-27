@@ -92,7 +92,7 @@ class WeChatSDK(object):
         if callable(msg_parser):
             parsed = msg_parser(raw)
         else:
-            parsed = self.parse_invalid_type(raw)
+            parsed = self._parse_invalid_type(raw)
 
         formatted.update(parsed)
         return formatted

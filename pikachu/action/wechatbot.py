@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Yang Gao<gaoyang.public@gmail.com>
 from pikachu.backend.wechat import WeChatSDK, WeChatReply
+from pikachu.log import *
 
 class WeChatBotRuntimeError(Exception):
     pass
@@ -13,7 +14,7 @@ class InvalidEventType(WeChatBotRuntimeError):
 
 class WeChatBot(object):
     msg_type = ['text', 'image', 'news', 'event']
-    event_type = ['click', 'subscribe']
+    event_type = ['click', 'subscribe' ]
 
     def __init__(self):
         pass
@@ -30,23 +31,24 @@ class WeChatBot(object):
         mtype = kw.get('mtype', '')
         reflect_content = ''
 
-        if not mtype in self.msg_type:
-            raise InvalidMsgType()
+        #if not mtype in self.msg_type:
+        #    raise InvalidMsgType()
 
         answer_func = getattr(self, 'answer_%s' % mtype,
-                              '_invalid_msg_type')
+                              self._invalid_msg_type)
 
         if callable(answer_func):
             reflect_content = answer_func(**kw)
         return reflect_content
 
     def answer_event(self, **kw):
-        event = kw.get('event', '')
+        event = kw.get('event', '').lower()
         answer = ''
-        if not event in self.event_type:
-            raise InvalidEventType()
+        #if not event in self.event_type:
+        #    raise InvalidEventType()
 
-        event_func = getattr(self, '_event_%s' % event, '_invalid_event')
+        event_func = getattr(self, '_event_%s' % event, self._invalid_event)
+        debug('event_func type: %s %s' % (type(event_func), event_func))
         if callable(event_func):
             answer = event_func(**kw)
         return answer
@@ -67,13 +69,17 @@ class WeChatBot(object):
         return reply.text_reply()
 
     def _event_click(self, **kw):
-        pass
+        return ''
 
     def _event_subscribe(self, **kw):
-        pass
+        return ''
 
     def _invalid_event(self, **kw):
+        event = kw.get('event', '')
+        debug('Got an invalide event "%s").' % event)
         return ''
 
     def _invalid_msg_type(self, **kw):
+        mtype = kw.get('mtype', '')
+        debug('Got an invalide message type "%s".' % mtype)
         return ''
