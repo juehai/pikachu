@@ -25,8 +25,18 @@ class RespondWeChatService(Resource):
         request.content.seek(0, 0)
         content = request.content.read()
         debug("content size = %d" % len(content))
+        signature = request.args.get('signature', [''])[0]
+        timestamp  = request.args.get('timestamp', [''])[0]
+        nonce  = request.args.get('nonce', [''])[0]
+        wechat = WeChatSDK()
+        if not wechat.validate(signature, timestamp, nonce):
+            error_message = "sign: %s, timestamp: %s, nonce: %s" % (signature,
+                                                                   timestamp,
+                                                                   nonce)
+            error(error_message)
+            return defer.fail(WeChatValidateError(error_message))
         if content:
-            return defer.succeed(WeChatSDK.parse(content))
+            return defer.succeed(wechat.parse(content))
         else:
             return defer.succeed(None)
 
@@ -34,6 +44,7 @@ class RespondWeChatService(Resource):
         #request.setHeader('Content-Type', 'application/xhtml+xml; charset=UTF-8')
         request.setHeader('Content-Type', 'text/xml; charset=UTF-8')
         if isinstance(value, Failure):
+            request.setHeader('Content-Type', 'text/html; charset=UTF-8')
             err = value.value
             request.setResponseCode(500)
             if isinstance(err, WeChatValidateError):
@@ -48,12 +59,11 @@ class RespondWeChatService(Resource):
         else:
             request.setResponseCode(200)
             debug("value type: %s" % type(value))
-            debug(value)
             request.write(value.encode('utf-8'))
         request.finish()
 
     def respond(self, res, request):
-        robot = Talkbot()
+        robot = WeChatBot()
         content = robot.reflect(**res)
         return content
 

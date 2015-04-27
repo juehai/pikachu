@@ -28,7 +28,8 @@ class PikachuServiceMaker(object):
         c = options["config"]
 
         from pikachu import PikachuConfig
-        config = PikachuConfig.configure(c)
+        config = PikachuConfig()
+        PikachuConfig.configure(c)
 
         from pikachu.service import site_configure
         site_root = site_configure(config)

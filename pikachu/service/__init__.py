@@ -2,7 +2,7 @@ from twisted.web import resource
 from pikachu.service.hello import HelloService
 from pikachu.service.internal import InternalService
 from pikachu.service.internal import AccessTokenService
-from pikachu.service.respond import RespondWeChatService
+from pikachu.service.respond_wechat import RespondWeChatService
 
 __all__ = ['site_configure']
 
@@ -16,5 +16,5 @@ def site_configure(c):
     # root nodes
     root.putChild(HelloService.serviceName, HelloService(c))
     root.putChild(InternalService.serviceName, internal_branch)
-    root.putChild(ReplyWeChatService.serviceName, ReplyWeChatService(c))
+    root.putChild(RespondWeChatService.serviceName, RespondWeChatService(c))
     return root

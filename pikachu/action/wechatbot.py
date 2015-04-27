@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Author: Yang Gao<gaoyang.public@gmail.com>
+from pikachu.backend.wechat import WeChatSDK, WeChatReply
 
 class WeChatBotRuntimeError(Exception):
     pass

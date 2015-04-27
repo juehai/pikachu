@@ -8,6 +8,7 @@ from urllib import urlencode
 from urllib3.util import parse_url
 from urllib3.util.url import Url
 from urllib3.exceptions import LocationParseError
+import codecs
 
 class PikachuConfig(object):
 
