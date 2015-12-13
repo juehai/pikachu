@@ -2,9 +2,8 @@
 # Author: Yang Gao<gaoyang.public@gmail.com>
 from twisted.internet import reactor
 from twisted.internet import defer
-from twisted.internet import protocol
 from txredisapi import lazyConnectionPool, ConnectionPool
-from pikachu.log import *
+#from pikachu.log import *
 
 __all__ = ['dStore', 'PikachuRedis']
 
@@ -14,7 +13,7 @@ class PikachuRedis(object):
     @classmethod
     def setup(cls, host, port=6379, poolsize=5):
         PikachuRedis.client = lazyConnectionPool(host=host, port=port,
-                                             poolsize=poolsize)
+                                     poolsize=poolsize, reconnect=False)
         return cls.client
 
     @defer.inlineCallbacks
@@ -38,6 +37,6 @@ class PikachuRedis(object):
 dStore = PikachuRedis()
 
 if __name__ == '__main__':
-    dStore.setup('192.168.86.13')
+    dStore.setup('127.0.0.1')
     dStore.info()
     reactor.run()

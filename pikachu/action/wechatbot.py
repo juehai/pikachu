@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 # Author: Yang Gao<gaoyang.public@gmail.com>
+from twisted.internet import defer
+from twisted.web.client import getPage
 from pikachu.backend.wechat import WeChatSDK, WeChatReply
 from pikachu.log import *
+from ujson import decode as json_decode
+import re
 
 class WeChatBotRuntimeError(Exception):
     pass
@@ -11,6 +15,27 @@ class InvalidMsgType(WeChatBotRuntimeError):
 
 class InvalidEventType(WeChatBotRuntimeError):
     pass
+
+
+@defer.inlineCallbacks
+def getZTOTracking(billcodes):
+    zto_api = 'http://zto.co.nz/api/v1/tracking?billcode=%s'
+    page = yield getPage(zto_api % ','.join(billcodes))
+    res = json_decode(page)
+    content = ''
+    if res['data']:
+#        debug(u'Tracking data: %s' % res['data'])
+        for datum in res['data']:
+            content = '%s\n%s\n' % (content, '-'*10)
+            content = content + u'运单号: %s\n' % datum['billCode']
+            trace = '\n'.join(map(lambda x: '%s %s %s'% (x['scanDate'], 
+                            x['scanType'] ,x['desc']), datum['traces']))
+            content = '%s\n%s\n' % (content, trace)
+#    debug('ZTO Tracking return: %s' % content.encode('utf-8'))
+#    debug('ZTO Tracking return type: %s' % type(content))
+
+    defer.returnValue(content)
+
 
 class WeChatBot(object):
     msg_type = ['text', 'image', 'news', 'event']
@@ -53,20 +78,30 @@ class WeChatBot(object):
             answer = event_func(**kw)
         return answer
 
-    def answer_text(self, **kw):
-        info = self._get_common_info(**kw)
-        if info['message'].startswith('trademe#'):
-            info['content'] = u'Trademe Monitor has stoped.'
-        else:
-            info['content'] = info['message']
-
+    def _make_text_reply(self, content, sender='', receiver=''):
         reply = WeChatReply(
-            sender=info['sender'],
-            receiver=info['receiver'],
+            sender=sender,
+            receiver=receiver,
             mtype='text',
-            content=info['content']
+            content=content,
         )
         return reply.text_reply()
+
+    def answer_text(self, **kw):
+        info = self._get_common_info(**kw)
+        debug('received wechat info: %s' % info)
+        # find the 6 and 12 bits numbers in the message.
+        re_express_billcodes = re.compile(r'(?<!\d)(\d{12}|\d{7})(?!\d)')
+        d = defer.succeed('')
+        is_billcode = re_express_billcodes.search(info['message'])
+        debug('is_billcode: %s' % is_billcode)
+        if is_billcode:
+            billcodes = re_express_billcodes.findall(info['message'])
+
+            d = getZTOTracking(billcodes)
+            d.addCallback(self._make_text_reply, sender=info['sender'], 
+                                            receiver=info['receiver'])
+        return d
 
     def _event_click(self, **kw):
         return ''
@@ -83,3 +118,4 @@ class WeChatBot(object):
         mtype = kw.get('mtype', '')
         debug('Got an invalide message type "%s".' % mtype)
         return ''
+

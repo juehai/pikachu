@@ -61,6 +61,7 @@ class RespondWeChatService(Resource):
             debug("value type: %s" % type(value))
             request.write(value.encode('utf-8'))
         request.finish()
+        return NOT_DONE_YET
 
     def respond(self, res, request):
         robot = WeChatBot()
