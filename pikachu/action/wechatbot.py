@@ -87,6 +87,15 @@ class WeChatBot(object):
         )
         return reply.text_reply()
 
+    def _make_transfer_reply(self, content, sender='', receiver=''):
+        reply = WeChatReply(
+            sender = sender,
+            receiver=receiver,
+            mtype='transfer_customer_service',
+            content=content
+        )
+        return reply.transfer_customer_service()
+
     def answer_text(self, **kw):
         info = self._get_common_info(**kw)
         debug('received wechat info: %s' % info)
@@ -100,6 +109,11 @@ class WeChatBot(object):
 
             d = getZTOTracking(billcodes)
             d.addCallback(self._make_text_reply, sender=info['sender'], 
+                                            receiver=info['receiver'])
+        else:
+            # if not found any billcode transfer the message to service
+            d = defer.succeed(info['message'])
+            d.addCallback(self._make_transfer_reply, sender=info['sender'],
                                             receiver=info['receiver'])
         return d
 

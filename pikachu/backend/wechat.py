@@ -224,6 +224,11 @@ class WeChatReply(object):
         )
         return template % item
 
+    def transfer_customer_service(self):
+        shared = self._shared_reply('transfer_customer_service')
+        template = '<xml>%s</xml>'
+        return template % shared
+
     def text_reply(self):
         shared = self._shared_reply('text')
         template = '<xml>%s<Content><![CDATA[%s]]></Content></xml>'
