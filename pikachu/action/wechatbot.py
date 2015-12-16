@@ -2,6 +2,7 @@
 # Author: Yang Gao<gaoyang.public@gmail.com>
 from twisted.internet import defer
 from twisted.web.client import getPage
+from twisted.python.failure import Failure
 from pikachu.backend.wechat import WeChatSDK, WeChatReply
 from pikachu.log import *
 from ujson import decode as json_decode
@@ -15,7 +16,6 @@ class InvalidMsgType(WeChatBotRuntimeError):
 
 class InvalidEventType(WeChatBotRuntimeError):
     pass
-
 
 @defer.inlineCallbacks
 def getZTOTracking(billcodes):
@@ -42,7 +42,16 @@ class WeChatBot(object):
     event_type = ['click', 'subscribe' ]
 
     def __init__(self):
-        pass
+        sdk = WeChatSDK()
+        d = sdk.getAccessToken()
+        
+        d.addCallback(self._set_access_token)
+
+    def _set_access_token(self, token):
+        if isinstance(token, Failure):
+            raise
+        debug('save Access Token: %s' % token)
+        self.access_token = token
 
     def _get_common_info(self, **kw):
         info = dict(
@@ -118,6 +127,10 @@ class WeChatBot(object):
         return d
 
     def _event_click(self, **kw):
+        info = self._get_common_info(**kw)
+        debug('received click event info: %s' % info)
+        event_key = kw.get('event_key', '')
+        if not event_key: return ''
         return ''
 
     def _event_subscribe(self, **kw):

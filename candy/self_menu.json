@@ -1,0 +1,50 @@
+{
+        "button": [
+            {
+                "name": "物流跟踪",
+                "type": "view",
+                "url": "http://www.zto.co.nz"
+            },
+            {
+                "name": "联系我们",
+                "sub_button": 
+                    [
+                        {
+                            "name": "电话联系",
+                            "type": "view",
+                            "url": "http://mp.weixin.qq.com/s?__biz=MzIwMzA4ODE5OA==&mid=400141138&idx=1&sn=2b45ec8b6a15c0c36fbc2d74aac5cdd9&scene=18#wechat_redirect"
+                        }
+                    ]
+            },
+            {
+                "name": "服务售后",
+                "sub_button": [ 
+                        {
+                            "name": "发货要求",
+                            "type": "view",
+                            "url": "http://mp.weixin.qq.com/s?__biz=MzIwMzA4ODE5OA==&mid=400081907&idx=2&sn=54521132a4d15eccf7aa4fdea39c0b27&scene=18#wechat_redirect"
+                        },
+                        {
+                            "name": "面单填写",
+                            "type": "view",
+                            "url": "http://mp.weixin.qq.com/s?__biz=MzIwMzA4ODE5OA==&mid=400081907&idx=3&sn=7822e29a494f57d2eb2eb9fa2731724f&scene=18#wechat_redirect"
+                        },
+                        {
+                            "name": "包裹理赔",
+                            "type": "view",
+                            "url": "http://mp.weixin.qq.com/s?__biz=MzIwMzA4ODE5OA==&mid=400141083&idx=1&sn=f86f33b32f2cef5072843d085ca39f02&scene=18#wechat_redirect"
+                        },
+                        {
+                            "name": "禁寄物品",
+                            "type": "view",
+                            "url": "http://mp.weixin.qq.com/s?__biz=MzIwMzA4ODE5OA==&mid=400141060&idx=1&sn=c18224cffff7f96f38a60beb254c6acd&scene=18#wechat_redirect"
+                        },
+                        {
+                            "name": "物流查询小窍门",
+                            "type": "view",
+                            "url": "http://mp.weixin.qq.com/s?__biz=MzIwMzA4ODE5OA==&mid=400129180&idx=5&sn=165fb4c9a07c9111a6d2321950ae0660&scene=18#wechat_redirect"
+                        }
+                    ]
+            }
+        ]
+}

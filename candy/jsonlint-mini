@@ -1,0 +1,71 @@
+#!/usr/bin/env python2.7
+# -*- coding: utf-8 -*-
+# Author: JueHai <juehai.gy AT gmail.com>
+# vim: ts=4 et
+"""
+* Example usage:
+  $ python jsonlint-mini.py < xx.json
+  or 
+  $ echo xx.json | python jsonlint-mini.py 
+* xx.json content:
+{
+  "foo": true,
+  "bar": false,
+  baz: -23
+}
+* OUTPUT:
+Invalid JSON
+ 
+  Expecting property name: line 4 column 3 (char 35)
+    baz: -23
+    ^-- Expecting property name
+"""
+
+import re
+import sys
+try:
+    import simplejson as json
+except ImportError as e:
+    import json
+from cStringIO import StringIO
+
+def parse_error(err):
+    """
+    "Parse" error string (formats) raised by simplejson:
+    '%s: line %d column %d (char %d)'
+    '%s: line %d column %d - line %d column %d (char %d - %d)'
+    """
+    ret = re.match(r"""^
+        (?P<msg>[^:]+):\s+
+        line\ (?P<lineno>\d+)\s+
+        column\ (?P<colno>\d+)\s+
+        (?:-\s+
+          line\ (?P<endlineno>\d+)\s+
+          column\ (?P<endcolno>\d+)\s+
+        )?
+        \(char\ (?P<pos>\d+)(?:\ -\ (?P<end>\d+))?\)
+    $""", err, re.VERBOSE)
+    err = ret.groupdict()
+    for k, v in err.items():
+        if v and v.isdigit():
+            err[k] = int(v)
+    obj = StringIO(src)
+    all_lines = obj.readlines()
+    line = all_lines[err['lineno'] - 1]
+    result = "%s\n\n%s\n%s^-- %s\n" % (msg, line.replace("\n", ""), " " * (err["colno"] - 1), err["msg"])
+    return result
+
+if __name__ == '__main__':
+    try:
+        src = sys.stdin.read()
+        json.loads(src)
+    except KeyboardInterrupt:
+        sys.exit(0)
+    except ValueError, err:
+        print "Invalid JSON"
+        msg = err.message
+        print parse_error(msg)
+        sys.exit(1)
+    else:
+        print "Valid JSON"
+        sys.exit(0)
