@@ -34,7 +34,9 @@ def getZTOTracking(billcodes):
 #        debug(u'Tracking data: %s' % res['data'])
         for datum in res['data']:
             content = '%s\n%s\n' % (content, '-'*10)
-            content = content + u'运单号: %s\n' % datum['billCode']
+            content = content + u'国际运单号: %s\n' % datum['billCode']
+            if datum.has_key('order_id'):
+                content = content + u'订单号: %s\n' % datum['order_id']
             trace = '\n'.join(map(lambda x: '%s %s %s'% (x['scanDate'], 
                             x['scanType'] ,x['desc']), datum['traces']))
             content = '%s\n%s\n' % (content, trace)
