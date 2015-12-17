@@ -2,8 +2,8 @@
         "button": [
             {
                 "name": "物流跟踪",
-                "type": "view",
-                "url": "http://www.zto.co.nz"
+                "type": "click",
+                "key": "V1001_TRACKING"
             },
             {
                 "name": "联系我们",
@@ -32,7 +32,7 @@
                         {
                             "name": "包裹理赔",
                             "type": "view",
-                            "url": "http://mp.weixin.qq.com/s?__biz=MzIwMzA4ODE5OA==&mid=400141083&idx=1&sn=f86f33b32f2cef5072843d085ca39f02&scene=18#wechat_redirect"
+                            "url": "http://mp.weixin.qq.com/s?__biz=MzIwMzA4ODE5OA==&mid=401030556&idx=1&sn=de22495204a2d3bc6379547b84d8fcd1&scene=18#wechat_redirect"
                         },
                         {
                             "name": "禁寄物品",

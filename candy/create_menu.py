@@ -5,7 +5,7 @@ from ujson import decode as json_decode, encode as json_encode
 import requests
 import sys
 
-token = 'PZUa3XneLZuQ5kH5N7GDnKO9D8I413NOcpeW9w0DCm4gy_nI0h0DgYUpr2PbvsQ8llXa1ZkNjxpAD9ZvQIC1E1NjHcANXlHF3KUZqiYQngkARDiAIAMDP'
+token = '195ZWfkVYnbDT-rxPhMMvZ8DrXmTsN2xzwFEQGzXkV5teP6o1IThHgZ2karVVPspQYJaLLaKKTen1_RNhY8zhXT_1K1rt4wkz8ni2PuW3XwPSVjAIAGJM'
 API = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=%s' % token
 
 def getConfig(cfile):

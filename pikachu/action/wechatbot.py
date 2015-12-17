@@ -17,6 +17,11 @@ class InvalidMsgType(WeChatBotRuntimeError):
 class InvalidEventType(WeChatBotRuntimeError):
     pass
 
+event_mapping = {
+    "V1001_TRACKING": u" -请点击左侧键盘图片\n -直接输入运单号码\n -多个单号请用空格隔开\n -最多输入5个单号"
+
+}
+
 @defer.inlineCallbacks
 def getZTOTracking(billcodes):
     zto_api = 'http://zto.co.nz/api/v1/tracking?billcode=%s'
@@ -130,7 +135,12 @@ class WeChatBot(object):
         info = self._get_common_info(**kw)
         debug('received click event info: %s' % info)
         event_key = kw.get('event_key', '')
+        debug('received event key: %s' % event_key)
         if not event_key: return ''
+        if event_mapping.has_key(event_key):
+            message = event_mapping.get(event_key, '')
+            return self._make_text_reply(message, sender=info['sender'],
+                                           receiver=info['receiver'])
         return ''
 
     def _event_subscribe(self, **kw):

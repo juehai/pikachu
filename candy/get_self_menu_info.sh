@@ -1,5 +1,5 @@
 #!/bin/bash
-token='PZUa3XneLZuQ5kH5N7GDnKO9D8I413NOcpeW9w0DCm4gy_nI0h0DgYUpr2PbvsQ8llXa1ZkNjxpAD9ZvQIC1E1NjHcANXlHF3KUZqiYQngkARDiAIAMDP'
+token='195ZWfkVYnbDT-rxPhMMvZ8DrXmTsN2xzwFEQGzXkV5teP6o1IThHgZ2karVVPspQYJaLLaKKTen1_RNhY8zhXT_1K1rt4wkz8ni2PuW3XwPSVjAIAGJM'
 API='https://api.weixin.qq.com/cgi-bin/get_current_selfmenu_info?access_token=ACCESS_TOKEN'
 
 URL=$(echo $API | sed -e "s/ACCESS_TOKEN/$token/")
