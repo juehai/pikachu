@@ -25,7 +25,9 @@ event_mapping = {
 @defer.inlineCallbacks
 def getZTOTracking(billcodes):
     zto_api = 'http://zto.co.nz/api/v1/tracking?billcode=%s'
-    page = yield getPage(zto_api % ','.join(billcodes))
+    url = str(zto_api % ','.join(billcodes))
+    debug('zto_api: %s' % type(url))
+    page = yield getPage(url)
     res = json_decode(page)
     content = ''
     if res['data']:
@@ -120,7 +122,7 @@ class WeChatBot(object):
         debug('is_billcode: %s' % is_billcode)
         if is_billcode:
             billcodes = re_express_billcodes.findall(info['message'])
-
+            debug('Found billcodes: %s' % billcodes)
             d = getZTOTracking(billcodes)
             d.addCallback(self._make_text_reply, sender=info['sender'], 
                                             receiver=info['receiver'])
