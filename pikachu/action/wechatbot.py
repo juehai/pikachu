@@ -118,7 +118,7 @@ class WeChatBot(object):
         info = self._get_common_info(**kw)
         debug('received wechat info: %s' % info)
         # find the 6 and 12 bits numbers in the message.
-        re_express_billcodes = re.compile(r'(?<!\d)(\d{12}|\d{7})(?!\d)')
+        re_express_billcodes = re.compile(r'(?<!\d)(\d{12}|\d{8}|\d{7})(?!\d)')
         d = defer.succeed('')
         is_billcode = re_express_billcodes.search(info['message'])
         debug('is_billcode: %s' % is_billcode)
